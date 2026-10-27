@@ -55,3 +55,21 @@ Only analyze captures you own, are authorized to inspect, or that were intention
 30 synthetic tests cover all four file magic variants, VLANs, IPv4/IPv6, IPv6 extension/fragment skips, malformed framing/transport headers, DNS bounds, resource limits, redaction, port thresholds, inclusive windows, repeated ports, SYN/ACK exclusion, exit states and overwrite protection. CI runs on Windows 2022 and Ubuntu 24.04 with Python 3.10-3.13.
 
 Next real work: PCAPNG support with fixtures; richer DNS decoding; bidirectional sessions and Zeek-log import; a local investigation UI and timeline; benchmarks against known safe capture fixtures. These are roadmap items, not delivered features. Learn the binary parser, five-tuple grouping and window rule before claiming interview ownership or production deployment.
+
+## Reproducible port-scan study artifacts (revision 3)
+
+The public [versioned artifact archive](https://github.com/ar-yan9/pcap-workbench/blob/acaa657409ee5f8f8429954b9114996a4940456d/1-portscan-study-v3.zip) contains a synthetic labeled PCAP, generator, packet/event labels, strict evaluator, nine matching tests, expected outputs, ten-run-per-size runtime/RSS measurements, a frozen implementation and SHA-256 verification. It is an archive, not an unpacked source tree. The manuscript itself is not published here.
+
+From a clean clone at artifact commit `acaa657409ee5f8f8429954b9114996a4940456d`:
+
+```sh
+git checkout acaa657409ee5f8f8429954b9114996a4940456d
+python3 -m zipfile -e 1-portscan-study-v3.zip study
+cd study/portscan-study-v3
+python3 verify.py
+python3 -m unittest -v test_evaluation
+python3 evaluate.py evaluated_workbench.py data/eval.pcap data/eval.labels
+python3 benchmark.py evaluated_workbench.py
+```
+
+Use `py -3.11` instead of `python3` on Windows for evaluation/verification. The RSS benchmark requires Linux (`os.wait4`). See the archive README for metric definitions, fixture changes, seeds, and benchmark limits. Default alert precision is 2/3, event recall is 2/5, and the event-unit matrix is TP=2/FN=3/FP=1/TN=2. These synthetic fixture scores do not establish real-world accuracy or superiority over Snort/Zeek. Detector implementation remains pinned to `063ad1d4d75de970fbf84c7c5d5f46ef9709e36f`.
