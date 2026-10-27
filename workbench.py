@@ -96,23 +96,39 @@ def decode_packet(packet):
             return None, 'malformed-vlan'
         kind = struct.unpack('!H', data[offset+2:offset+4])[0]
         offset += 4
-    if kind != 0x0800:
-        return None, 'unsupported-network-type'
     ip = data[offset:]
-    if len(ip) < 20 or ip[0] >> 4 != 4:
-        return None, 'malformed-ipv4'
-    length = (ip[0] & 15)*4
-    total = struct.unpack('!H', ip[2:4])[0]
-    if length < 20 or total < length or len(ip) < total:
-        return None, 'malformed-or-truncated-ipv4'
-    fragment = struct.unpack('!H', ip[6:8])[0]
-    if fragment & 0x3fff:
-        return None, 'fragmented-ipv4'
-    protocol = ip[9]
+    if kind == 0x0800:
+        if len(ip) < 20 or ip[0] >> 4 != 4:
+            return None, 'malformed-ipv4'
+        length = (ip[0] & 15)*4
+        total = struct.unpack('!H', ip[2:4])[0]
+        if length < 20 or total < length or len(ip) < total:
+            return None, 'malformed-or-truncated-ipv4'
+        fragment = struct.unpack('!H', ip[6:8])[0]
+        if fragment & 0x3fff:
+            return None, 'fragmented-ipv4'
+        protocol = ip[9]
+        src, dst = ip[12:16], ip[16:20]
+        payload = ip[length:total]
+    elif kind == 0x86dd:
+        if len(ip) < 40 or ip[0] >> 4 != 6:
+            return None, 'malformed-ipv6'
+        payload_length = struct.unpack('!H', ip[4:6])[0]
+        total = 40 + payload_length
+        if len(ip) < total:
+            return None, 'malformed-or-truncated-ipv6'
+        protocol = ip[6]
+        if protocol == 44:
+            return None, 'fragmented-ipv6'
+        if protocol not in (6, 17):
+            return None, 'unsupported-ipv6-next-header'
+        src, dst = ip[8:24], ip[24:40]
+        payload = ip[40:total]
+    else:
+        return None, 'unsupported-network-type'
     event = {'number': packet['number'], 'time_ns': packet['time_ns'],
-             'src': str(ipaddress.ip_address(ip[12:16])), 'dst': str(ipaddress.ip_address(ip[16:20])),
+             'src': str(ipaddress.ip_address(src)), 'dst': str(ipaddress.ip_address(dst)),
              'bytes': total, 'protocol': 'TCP' if protocol == 6 else 'UDP' if protocol == 17 else str(protocol)}
-    payload = ip[length:total]
     if protocol == 6:
         if len(payload) < 20:
             return None, 'malformed-tcp'
@@ -195,7 +211,7 @@ def investigate(path, window=60, ports=10, max_packets=100000, max_bytes=64*1024
                      'snaplen_truncated_records':sum(p['captured']<p['original'] for p in packets)},
             'top_flows':flow_rows, 'dns_queries':dns_rows, 'alerts':alerts,'notices':notices,
             'settings':{'window_seconds':window,'port_threshold':ports},
-            'scope':'Classic PCAP Ethernet IPv4 TCP/UDP only. Per-report pseudonyms; no payload export. Heuristics, not confirmed attacks.'}
+            'scope':'Classic PCAP Ethernet IPv4/IPv6 TCP/UDP only. Per-report pseudonyms; no payload export. Heuristics, not confirmed attacks.'}
 
 
 def main(argv=None):
