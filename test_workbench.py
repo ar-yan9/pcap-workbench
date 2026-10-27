@@ -1,6 +1,7 @@
 """Synthetic captures and malformed byte fixtures only."""
 import contextlib
 import io
+import ipaddress
 import json
 from pathlib import Path
 import struct
@@ -8,6 +9,33 @@ import tempfile
 import unittest
 import make_demo as demo
 import workbench as wb
+
+
+def ipv6_frame(protocol, payload, src='2001:db8::10', dst='2001:db8::20'):
+    source = ipaddress.ip_address(src).packed
+    target = ipaddress.ip_address(dst).packed
+    header = struct.pack('!IHBB16s16s', 6 << 28, len(payload), protocol, 64, source, target)
+    return bytes.fromhex('02000000000202000000000186dd') + header + payload
+
+
+def tcp6_frame(port, flags=2):
+    segment = struct.pack('!HHIIBBHHH', 45000, port, 1, 0, 0x50, flags, 4096, 0, 0)
+    source = ipaddress.ip_address('2001:db8::10').packed
+    target = ipaddress.ip_address('2001:db8::20').packed
+    pseudo = source + target + struct.pack('!I3xB', len(segment), 6)
+    segment = segment[:16] + struct.pack('!H', demo.checksum(pseudo + segment)) + segment[18:]
+    return ipv6_frame(6, segment)
+
+
+def dns6_frame():
+    question = b'\x04demo\x04test\x00' + struct.pack('!HH', 1, 1)
+    dns = struct.pack('!6H', 1, 0x0100, 1, 0, 0, 0) + question
+    udp = struct.pack('!4H', 53000, 53, 8 + len(dns), 0) + dns
+    source = ipaddress.ip_address('2001:db8::10').packed
+    target = ipaddress.ip_address('2001:db8::53').packed
+    pseudo = source + target + struct.pack('!I3xB', len(udp), 17)
+    udp = udp[:6] + struct.pack('!H', demo.checksum(pseudo + udp)) + udp[8:]
+    return ipv6_frame(17, udp, dst='2001:db8::53')
 
 
 class CaptureTests(unittest.TestCase):
@@ -88,6 +116,37 @@ class CaptureTests(unittest.TestCase):
         r=self.run_report()
         self.assertEqual(r['stats']['decoded_packets'],0)
         self.assertEqual(sum(r['stats']['skipped_by_reason'].values()),3)
+
+    def test_ipv6_tcp_scan_and_redaction(self):
+        self.write([tcp6_frame(p) for p in range(20,32)])
+        r=self.run_report()
+        self.assertEqual(r['stats']['decoded_packets'],12)
+        self.assertEqual(len(r['alerts']),1)
+        self.assertEqual(r['top_flows'][0]['target_port'],20)
+        text=json.dumps(r)
+        self.assertNotIn('2001:db8::10',text)
+        self.assertNotIn('2001:db8::20',text)
+    def test_ipv6_dns_question(self):
+        self.write([dns6_frame()])
+        r=self.run_report()
+        self.assertEqual(r['stats']['decoded_packets'],1)
+        self.assertEqual(r['stats']['protocol_packets'],{'UDP':1})
+        self.assertEqual(r['stats']['dns_questions'],1)
+        self.assertNotIn('demo.test',json.dumps(r))
+    def test_ipv6_extension_header_skipped(self):
+        self.write([ipv6_frame(0,b'')])
+        self.assertEqual(self.run_report()['stats']['skipped_by_reason'],{'unsupported-ipv6-next-header':1})
+    def test_ipv6_fragment_skipped(self):
+        self.write([ipv6_frame(44,b'\0'*8)])
+        self.assertEqual(self.run_report()['stats']['skipped_by_reason'],{'fragmented-ipv6':1})
+    def test_malformed_ipv6(self):
+        self.write([bytes.fromhex('02000000000202000000000186dd')+b'\x60'+b'\0'*38])
+        self.assertEqual(self.run_report()['stats']['skipped_by_reason'],{'malformed-ipv6':1})
+    def test_truncated_ipv6_payload(self):
+        frame=bytearray(ipv6_frame(17,b'\0'*8))
+        frame[18:20]=struct.pack('!H',20)
+        self.write([bytes(frame)])
+        self.assertEqual(self.run_report()['stats']['skipped_by_reason'],{'malformed-or-truncated-ipv6':1})
     def test_vlan(self):
         f=demo.tcp_frame(443);vlan=f[:12]+b'\x81\x00\x00\x01\x08\x00'+f[14:]
         self.write([vlan]);self.assertEqual(self.run_report()['stats']['decoded_packets'],1)
