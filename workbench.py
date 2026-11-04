@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Offline classic-PCAP investigation. No sniffing, network calls or payload export."""
+"""Offline classic-PCAP/PCAPNG investigation. No sniffing, network calls or payload export."""
 import argparse
 from collections import Counter, defaultdict, deque
 from datetime import datetime, timezone
@@ -14,46 +14,176 @@ import sys
 
 MAGIC = {b'\xd4\xc3\xb2\xa1': ('<', 1000000), b'\xa1\xb2\xc3\xd4': ('>', 1000000),
          b'\x4d\x3c\xb2\xa1': ('<', 1000000000), b'\xa1\xb2\x3c\x4d': ('>', 1000000000)}
+PCAPNG_MAGIC = b'\x0a\x0d\x0d\x0a'
+PCAPNG_ORDERS = {b'\x4d\x3c\x2b\x1a': '<', b'\x1a\x2b\x3c\x4d': '>'}
+PCAPNG_MAX_BLOCK = 16*1024*1024 + 4096
 
 
 def read_capture(path, max_packets=100000, max_bytes=64*1024*1024):
-    """Bounded classic PCAP reader; record numbers are the evidence references."""
-    packets, notices = [], []
+    """Bounded classic PCAP / first-section PCAPNG reader; record numbers are the evidence references."""
     with Path(path).open('rb') as stream:
-        header = stream.read(24)
-        if len(header) != 24 or header[:4] not in MAGIC:
-            raise ValueError('Expected classic PCAP, not PCAPNG or another format')
-        order, resolution = MAGIC[header[:4]]
-        major, minor, _, _, snaplen, linktype = struct.unpack(order+'HHIIII', header[4:])
-        if (major, minor) != (2, 4) or linktype != 1 or not 0 < snaplen <= 16*1024*1024:
-            raise ValueError('Requires PCAP 2.4, Ethernet link type 1 and a bounded snap length')
-        consumed = 24
-        while True:
-            record = stream.read(16)
-            if not record:
+        magic = stream.read(4)
+        if magic in MAGIC:
+            return _read_classic(stream, magic, max_packets, max_bytes)
+        if magic == PCAPNG_MAGIC:
+            return _read_pcapng(stream, max_packets, max_bytes)
+    raise ValueError('Expected classic PCAP or PCAPNG, not another format')
+
+
+def _read_classic(stream, magic, max_packets, max_bytes):
+    packets, notices = [], []
+    header = stream.read(20)
+    if len(header) != 20:
+        raise ValueError('Expected classic PCAP or PCAPNG, not another format')
+    order, resolution = MAGIC[magic]
+    major, minor, _, _, snaplen, linktype = struct.unpack(order+'HHIIII', header)
+    if (major, minor) != (2, 4) or linktype != 1 or not 0 < snaplen <= 16*1024*1024:
+        raise ValueError('Requires PCAP 2.4, Ethernet link type 1 and a bounded snap length')
+    consumed = 24
+    while True:
+        record = stream.read(16)
+        if not record:
+            break
+        number = len(packets) + 1
+        if number > max_packets:
+            notices.append('Packet limit reached; remaining records not analyzed')
+            break
+        if len(record) != 16:
+            notices.append('Truncated record header at packet %d' % number)
+            break
+        sec, fraction, captured, original = struct.unpack(order+'IIII', record)
+        if fraction >= resolution or captured > snaplen or captured > original:
+            notices.append('Invalid record metadata at packet %d' % number)
+            break
+        consumed += 16 + captured
+        if consumed > max_bytes:
+            notices.append('Byte limit reached; remaining records not analyzed')
+            break
+        data = stream.read(captured)
+        if len(data) != captured:
+            notices.append('Truncated record data at packet %d' % number)
+            break
+        packets.append({'number': number, 'time_ns': sec*1000000000 + fraction*(1000000000//resolution),
+                        'data': data, 'captured': captured, 'original': original})
+    return packets, notices, 'pcap'
+
+
+def _pcapng_options(order, data):
+    """Bounded option reader; yields (code, value) pairs."""
+    cursor = 0
+    while cursor + 4 <= len(data):
+        code, length = struct.unpack(order+'HH', data[cursor:cursor+4])
+        cursor += 4
+        if code == 0:
+            break
+        if cursor + length > len(data):
+            break
+        yield code, data[cursor:cursor+length]
+        cursor += length + (-length % 4)
+
+
+def _read_pcapng(stream, max_packets, max_bytes):
+    """First section only: Ethernet interfaces, Enhanced Packet Blocks, micro/nanosecond time."""
+    packets, notices = [], []
+    prologue = stream.read(8)
+    if len(prologue) != 8 or prologue[4:] not in PCAPNG_ORDERS:
+        raise ValueError('Expected classic PCAP or PCAPNG, not another format')
+    order = PCAPNG_ORDERS[prologue[4:]]
+    total = struct.unpack(order+'I', prologue[:4])[0]
+    if total < 28 or total > PCAPNG_MAX_BLOCK:
+        raise ValueError('Malformed PCAPNG section header')
+    rest = stream.read(total-12)
+    if len(rest) != total-12 or struct.unpack(order+'I', rest[-4:])[0] != total:
+        raise ValueError('Malformed PCAPNG section header')
+    if struct.unpack(order+'H', rest[0:2])[0] != 1:
+        raise ValueError('Requires PCAPNG major version 1')
+    consumed = total
+    interfaces, skipped = [], Counter()
+    while True:
+        head = stream.read(8)
+        if not head:
+            break
+        if len(head) != 8:
+            notices.append('Truncated PCAPNG block header')
+            break
+        block_type, total = struct.unpack(order+'II', head)
+        if block_type == 0x0A0D0D0A:
+            notices.append('Additional PCAPNG section not analyzed; only the first section is processed')
+            break
+        if total < 12 or total > PCAPNG_MAX_BLOCK:
+            notices.append('Malformed PCAPNG block length')
+            break
+        body = stream.read(total-8)
+        if len(body) != total-8:
+            notices.append('Truncated PCAPNG block data')
+            break
+        if struct.unpack(order+'I', body[-4:])[0] != total:
+            notices.append('Malformed PCAPNG block length')
+            break
+        consumed += total
+        if consumed > max_bytes:
+            notices.append('Byte limit reached; remaining blocks not analyzed')
+            break
+        body = body[:-4]
+        if block_type == 1:
+            if len(body) < 8:
+                notices.append('Malformed PCAPNG interface description')
                 break
+            linktype, _, snaplen = struct.unpack(order+'HHI', body[:8])
+            if linktype != 1:
+                interfaces.append(('skip', 'non-ethernet-interface'))
+                continue
+            if snaplen > 16*1024*1024:
+                interfaces.append(('skip', 'unbounded-snap-length'))
+                continue
+            resolution, state = 1000000, 'ok'
+            for code, value in _pcapng_options(order, body[8:]):
+                if code == 9 and len(value) >= 1:
+                    if value[0] in (6, 9):
+                        resolution = 10**value[0]
+                    else:
+                        state = 'skip'
+            if state == 'ok':
+                interfaces.append(('ok', snaplen, resolution))
+            else:
+                interfaces.append(('skip', 'unsupported-timestamp-resolution'))
+        elif block_type == 6:
             number = len(packets) + 1
             if number > max_packets:
                 notices.append('Packet limit reached; remaining records not analyzed')
                 break
-            if len(record) != 16:
-                notices.append('Truncated record header at packet %d' % number)
+            if len(body) < 20:
+                notices.append('Malformed PCAPNG packet block at packet %d' % number)
                 break
-            sec, fraction, captured, original = struct.unpack(order+'IIII', record)
-            if fraction >= resolution or captured > snaplen or captured > original:
+            interface, high, low, captured, original = struct.unpack(order+'IIIII', body[:20])
+            if interface >= len(interfaces):
+                skipped['unknown-interface'] += 1
+                continue
+            entry = interfaces[interface]
+            if entry[0] == 'skip':
+                skipped[entry[1]] += 1
+                continue
+            _, snaplen, resolution = entry
+            if captured > original or (snaplen and captured > snaplen) or 20+captured > len(body):
                 notices.append('Invalid record metadata at packet %d' % number)
                 break
-            consumed += 16 + captured
-            if consumed > max_bytes:
-                notices.append('Byte limit reached; remaining records not analyzed')
-                break
-            data = stream.read(captured)
-            if len(data) != captured:
-                notices.append('Truncated record data at packet %d' % number)
-                break
-            packets.append({'number': number, 'time_ns': sec*1000000000 + fraction*(1000000000//resolution),
-                            'data': data, 'captured': captured, 'original': original})
-    return packets, notices
+            timestamp = (high << 32) | low
+            packets.append({'number': number, 'time_ns': timestamp*(1000000000//resolution),
+                            'data': body[20:20+captured], 'captured': captured, 'original': original})
+        elif block_type == 3:
+            skipped['simple-packet-blocks'] += 1
+        else:
+            skipped['other-blocks'] += 1
+    labels = {'non-ethernet-interface': 'Skipped %d enhanced packet block(s) on non-Ethernet interface(s)',
+              'unbounded-snap-length': 'Skipped %d enhanced packet block(s) on interface(s) with an unbounded snap length',
+              'unsupported-timestamp-resolution': 'Skipped %d enhanced packet block(s) with an unsupported timestamp resolution (only micro/nanosecond supported)',
+              'unknown-interface': 'Skipped %d enhanced packet block(s) referencing an unknown interface',
+              'simple-packet-blocks': 'Skipped %d simple packet block(s); they carry no timestamps',
+              'other-blocks': 'Skipped %d other PCAPNG block(s) (name resolution, statistics or unknown types)'}
+    for reason, count in skipped.items():
+        if count:
+            notices.append(labels[reason] % count)
+    return packets, notices, 'pcapng'
 
 
 def dns_question(data):
@@ -160,7 +290,7 @@ def iso(time_ns):
 def investigate(path, window=60, ports=10, max_packets=100000, max_bytes=64*1024*1024):
     if window <= 0 or ports < 2 or max_packets <= 0 or max_bytes < 24:
         raise ValueError('Invalid analysis limits')
-    packets, notices = read_capture(path, max_packets, max_bytes)
+    packets, notices, capture_format = read_capture(path, max_packets, max_bytes)
     skipped, protocols = Counter(), Counter()
     events = []
     for packet in packets:
@@ -205,13 +335,13 @@ def investigate(path, window=60, ports=10, max_packets=100000, max_bytes=64*1024
                 'first':iso(f['first']),'last':iso(f['last'])} for (a,b,sp,dp,protocol),f in ranked]
     dns_rows=[{'name':pseudonym('dns',name),'query_type':qt,'queries':count}
               for (name,qt),count in queries.most_common(20)]
-    return {'stats':{'capture_records':len(packets),'decoded_packets':len(events),
+    return {'stats':{'capture_records':len(packets),'capture_format':capture_format,'decoded_packets':len(events),
                      'protocol_packets':dict(protocols), 'skipped_by_reason':dict(skipped),
                      'total_directional_flows':len(flows),'dns_questions':sum(queries.values()),
                      'snaplen_truncated_records':sum(p['captured']<p['original'] for p in packets)},
             'top_flows':flow_rows, 'dns_queries':dns_rows, 'alerts':alerts,'notices':notices,
             'settings':{'window_seconds':window,'port_threshold':ports},
-            'scope':'Classic PCAP Ethernet IPv4/IPv6 TCP/UDP only. Per-report pseudonyms; no payload export. Heuristics, not confirmed attacks.'}
+            'scope':'Classic PCAP and PCAPNG (first section) Ethernet IPv4/IPv6 TCP/UDP only. Per-report pseudonyms; no payload export. Heuristics, not confirmed attacks.'}
 
 
 def main(argv=None):
