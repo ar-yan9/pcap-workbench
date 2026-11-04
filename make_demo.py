@@ -45,14 +45,38 @@ def capture(frames,order='<',nano=False):
     return result
 
 
+def block(order, block_type, body):
+    """PCAPNG block with 32-bit padding and matching length fields."""
+    body += b'\0'*(-len(body) % 4)
+    length = 12 + len(body)
+    return struct.pack(order+'II', block_type, length)+body+struct.pack(order+'I', length)
+
+
+def capture_pcapng(frames, order='<', nano=False):
+    """Same synthetic frames as a first-section PCAPNG with Ethernet EPBs."""
+    bom = b'\x4d\x3c\x2b\x1a' if order == '<' else b'\x1a\x2b\x3c\x4d'
+    out = block(order, 0x0A0D0D0A, bom+struct.pack(order+'HHq', 1, 0, -1))
+    idb = struct.pack(order+'HHI', 1, 0, 65535)
+    if nano:
+        idb += struct.pack(order+'HH', 9, 1)+b'\x09'+b'\0'*3+struct.pack(order+'HH', 0, 0)
+    out += block(order, 1, idb)
+    for i, data in enumerate(frames):
+        units = (1767225600+i)*(1000000000 if nano else 1000000)
+        epb = struct.pack(order+'IIIII', 0, units >> 32, units & 0xffffffff, len(data), len(data))+data
+        out += block(order, 6, epb)
+    return out
+
+
 def main(argv=None):
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('output',nargs='?',default='demo.pcap')
+    parser.add_argument('--pcapng',action='store_true',help='write a PCAPNG capture instead of classic PCAP')
     args=parser.parse_args(argv)
     target=Path(args.output)
+    frames=[tcp_frame(p) for p in range(20,32)]+[dns_frame()]
     # Never replace an existing capture, even if it is a symlink.
     with target.open('xb') as handle:
-        handle.write(capture([tcp_frame(p) for p in range(20,32)]+[dns_frame()]))
+        handle.write(capture_pcapng(frames) if args.pcapng else capture(frames))
     print('Generated 13 synthetic packets:',target)
 
 
