@@ -179,4 +179,93 @@ class CaptureTests(unittest.TestCase):
         self.assertEqual(self.run_report()['stats']['capture_records'],13)
 
 
+class PcapngTests(unittest.TestCase):
+    def setUp(self):
+        self.temp=tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.path=Path(self.temp.name)/'test.pcapng'
+    def write(self,frames,**kw):
+        self.path.write_bytes(demo.capture_pcapng(frames,**kw))
+    def run_report(self,**kw):
+        return wb.investigate(self.path,**kw)
+    def shb_idb(self,linktype=1,tsresol=None):
+        out=demo.block('<',0x0A0D0D0A,b'\x4d\x3c\x2b\x1a'+struct.pack('<HHq',1,0,-1))
+        idb=struct.pack('<HHI',linktype,0,65535)
+        if tsresol is not None:
+            idb+=struct.pack('<HH',9,1)+bytes([tsresol])+b'\0'*3+struct.pack('<HH',0,0)
+        return out+demo.block('<',1,idb)
+    def epb(self,data):
+        units=1767225600*1000000
+        return demo.block('<',6,struct.pack('<IIIII',0,units>>32,units&0xffffffff,len(data),len(data))+data)
+    def test_demo_both_orders(self):
+        for order in ('<','>'):
+            self.write([demo.tcp_frame(p) for p in range(20,32)]+[demo.dns_frame()],order=order)
+            r=self.run_report()
+            self.assertEqual(r['stats']['capture_format'],'pcapng')
+            self.assertEqual(r['stats']['decoded_packets'],13)
+            self.assertEqual(r['stats']['dns_questions'],1)
+            self.assertEqual(len(r['alerts']),1)
+    def test_timestamps_match_classic(self):
+        frames=[demo.tcp_frame(p) for p in range(20,32)]
+        self.write(frames)
+        pcapng_alert=self.run_report()['alerts'][0]['detected_at']
+        self.path.write_bytes(demo.capture(frames))
+        classic_alert=self.run_report()['alerts'][0]['detected_at']
+        self.assertEqual(pcapng_alert,classic_alert)
+        self.write(frames,nano=True)
+        self.assertEqual(self.run_report()['alerts'][0]['detected_at'],classic_alert)
+    def test_second_section_skipped(self):
+        first=demo.capture_pcapng([demo.tcp_frame(p) for p in range(2)])
+        second=demo.capture_pcapng([demo.tcp_frame(p) for p in range(3)])
+        self.path.write_bytes(first+second)
+        r=self.run_report()
+        self.assertEqual(r['stats']['decoded_packets'],2)
+        self.assertTrue(any('Additional PCAPNG section' in n for n in r['notices']))
+    def test_simple_packet_block_skipped(self):
+        frame=demo.tcp_frame(443)
+        spb=demo.block('<',3,struct.pack('<I',len(frame))+frame)
+        self.path.write_bytes(self.shb_idb()+spb)
+        r=self.run_report()
+        self.assertEqual(r['stats']['decoded_packets'],0)
+        self.assertTrue(any('simple packet block' in n for n in r['notices']))
+    def test_other_blocks_skipped(self):
+        nrb=demo.block('<',4,b'')
+        self.path.write_bytes(self.shb_idb()+nrb+self.epb(demo.tcp_frame(443)))
+        r=self.run_report()
+        self.assertEqual(r['stats']['decoded_packets'],1)
+        self.assertTrue(any('other PCAPNG block' in n for n in r['notices']))
+    def test_mismatched_block_length(self):
+        self.write([demo.tcp_frame(443)])
+        data=bytearray(self.path.read_bytes());data[-1]^=0xff
+        self.path.write_bytes(data)
+        self.assertTrue(any('Malformed PCAPNG block length' in n for n in self.run_report()['notices']))
+    def test_truncated_block(self):
+        self.write([demo.tcp_frame(443)])
+        self.path.write_bytes(self.path.read_bytes()[:-1])
+        self.assertTrue(any('Truncated PCAPNG block data' in n for n in self.run_report()['notices']))
+    def test_non_ethernet_interface(self):
+        self.path.write_bytes(self.shb_idb(linktype=101)+self.epb(demo.tcp_frame(443)))
+        r=self.run_report()
+        self.assertEqual(r['stats']['decoded_packets'],0)
+        self.assertTrue(any('non-Ethernet' in n for n in r['notices']))
+    def test_unsupported_tsresol(self):
+        self.path.write_bytes(self.shb_idb(tsresol=0x86)+self.epb(demo.tcp_frame(443)))
+        r=self.run_report()
+        self.assertEqual(r['stats']['decoded_packets'],0)
+        self.assertTrue(any('unsupported timestamp resolution' in n for n in r['notices']))
+    def test_limits(self):
+        self.write([demo.tcp_frame(443)]*2)
+        self.assertTrue(any('Packet limit' in n for n in self.run_report(max_packets=1)['notices']))
+        self.assertTrue(any('Byte limit' in n for n in self.run_report(max_bytes=60)['notices']))
+    def test_cli_json_and_generator(self):
+        with contextlib.redirect_stdout(io.StringIO()):
+            demo.main([str(self.path),'--pcapng'])
+        out=io.StringIO()
+        with contextlib.redirect_stdout(out):
+            self.assertEqual(wb.main([str(self.path),'--format','json']),1)
+        stats=json.loads(out.getvalue())['stats']
+        self.assertEqual(stats['capture_format'],'pcapng')
+        self.assertEqual(stats['capture_records'],13)
+
+
 if __name__=='__main__':unittest.main()
