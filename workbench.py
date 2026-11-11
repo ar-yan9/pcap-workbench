@@ -17,10 +17,11 @@ MAGIC = {b'\xd4\xc3\xb2\xa1': ('<', 1000000), b'\xa1\xb2\xc3\xd4': ('>', 1000000
 PCAPNG_MAGIC = b'\x0a\x0d\x0d\x0a'
 PCAPNG_ORDERS = {b'\x4d\x3c\x2b\x1a': '<', b'\x1a\x2b\x3c\x4d': '>'}
 PCAPNG_MAX_BLOCK = 16*1024*1024 + 4096
+PCAPNG_MAX_SECTIONS = 4096
 
 
 def read_capture(path, max_packets=100000, max_bytes=64*1024*1024):
-    """Bounded classic PCAP / first-section PCAPNG reader; record numbers are the evidence references."""
+    """Bounded classic PCAP / multi-section PCAPNG reader; record numbers are the evidence references."""
     with Path(path).open('rb') as stream:
         magic = stream.read(4)
         if magic in MAGIC:
@@ -83,7 +84,7 @@ def _pcapng_options(order, data):
 
 
 def _read_pcapng(stream, max_packets, max_bytes):
-    """First section only: Ethernet interfaces, Enhanced Packet Blocks, micro/nanosecond time."""
+    """All sections: Ethernet interfaces, Enhanced Packet Blocks, micro/nanosecond time."""
     packets, notices = [], []
     prologue = stream.read(8)
     if len(prologue) != 8 or prologue[4:] not in PCAPNG_ORDERS:
@@ -99,6 +100,7 @@ def _read_pcapng(stream, max_packets, max_bytes):
         raise ValueError('Requires PCAPNG major version 1')
     consumed = total
     interfaces, skipped = [], Counter()
+    sections = 1
     while True:
         head = stream.read(8)
         if not head:
@@ -108,8 +110,34 @@ def _read_pcapng(stream, max_packets, max_bytes):
             break
         block_type, total = struct.unpack(order+'II', head)
         if block_type == 0x0A0D0D0A:
-            notices.append('Additional PCAPNG section not analyzed; only the first section is processed')
-            break
+            if sections >= PCAPNG_MAX_SECTIONS:
+                notices.append('Section limit reached; remaining sections not analyzed')
+                break
+            # A new section restarts the interface table and may change byte order.
+            bom = stream.read(4)
+            if len(bom) != 4 or bom not in PCAPNG_ORDERS:
+                notices.append('Malformed PCAPNG section header')
+                break
+            new_order = PCAPNG_ORDERS[bom]
+            total = struct.unpack(new_order+'I', head[4:])[0]
+            if total < 28 or total > PCAPNG_MAX_BLOCK:
+                notices.append('Malformed PCAPNG section header')
+                break
+            body = stream.read(total-12)
+            if len(body) != total-12 or struct.unpack(new_order+'I', body[-4:])[0] != total:
+                notices.append('Malformed PCAPNG section header')
+                break
+            consumed += total
+            if consumed > max_bytes:
+                notices.append('Byte limit reached; remaining blocks not analyzed')
+                break
+            if struct.unpack(new_order+'H', body[:2])[0] != 1:
+                notices.append('Unsupported PCAPNG major version in a later section; remaining data not analyzed')
+                break
+            order = new_order
+            interfaces = []
+            sections += 1
+            continue
         if total < 12 or total > PCAPNG_MAX_BLOCK:
             notices.append('Malformed PCAPNG block length')
             break
@@ -341,7 +369,7 @@ def investigate(path, window=60, ports=10, max_packets=100000, max_bytes=64*1024
                      'snaplen_truncated_records':sum(p['captured']<p['original'] for p in packets)},
             'top_flows':flow_rows, 'dns_queries':dns_rows, 'alerts':alerts,'notices':notices,
             'settings':{'window_seconds':window,'port_threshold':ports},
-            'scope':'Classic PCAP and PCAPNG (first section) Ethernet IPv4/IPv6 TCP/UDP only. Per-report pseudonyms; no payload export. Heuristics, not confirmed attacks.'}
+            'scope':'Classic PCAP and PCAPNG Ethernet IPv4/IPv6 TCP/UDP only. Per-report pseudonyms; no payload export. Heuristics, not confirmed attacks.'}
 
 
 def main(argv=None):
