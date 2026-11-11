@@ -214,13 +214,76 @@ class PcapngTests(unittest.TestCase):
         self.assertEqual(pcapng_alert,classic_alert)
         self.write(frames,nano=True)
         self.assertEqual(self.run_report()['alerts'][0]['detected_at'],classic_alert)
-    def test_second_section_skipped(self):
+    def shb(self,order='<'):
+        bom=b'\x4d\x3c\x2b\x1a' if order=='<' else b'\x1a\x2b\x3c\x4d'
+        return demo.block(order,0x0A0D0D0A,bom+struct.pack(order+'HHq',1,0,-1))
+    def idb(self,order='<',nano=False):
+        body=struct.pack(order+'HHI',1,0,65535)
+        if nano:
+            body+=struct.pack(order+'HH',9,1)+b'\x09'+b'\0'*3+struct.pack(order+'HH',0,0)
+        return demo.block(order,1,body)
+    def test_multiple_sections_decoded(self):
         first=demo.capture_pcapng([demo.tcp_frame(p) for p in range(2)])
         second=demo.capture_pcapng([demo.tcp_frame(p) for p in range(3)])
         self.path.write_bytes(first+second)
         r=self.run_report()
+        self.assertEqual(r['stats']['decoded_packets'],5)
+        self.assertEqual(r['stats']['capture_records'],5)
+        self.assertFalse(any('section' in n.lower() for n in r['notices']))
+    def test_section_order_change(self):
+        first=demo.capture_pcapng([demo.tcp_frame(443)],order='<')
+        second=demo.capture_pcapng([demo.tcp_frame(8443)],order='>')
+        self.path.write_bytes(first+second)
+        r=self.run_report()
         self.assertEqual(r['stats']['decoded_packets'],2)
-        self.assertTrue(any('Additional PCAPNG section' in n for n in r['notices']))
+        self.assertEqual(r['notices'],[])
+    def test_section_interfaces_reset(self):
+        first=demo.capture_pcapng([demo.tcp_frame(443)])
+        units=1767225600*1000000
+        epb=struct.pack('>IIIII',0,units>>32,units&0xffffffff,len(demo.tcp_frame(8443)),len(demo.tcp_frame(8443)))
+        second=self.shb('>')+demo.block('>',6,epb+demo.tcp_frame(8443))
+        self.path.write_bytes(first+second)
+        r=self.run_report()
+        self.assertEqual(r['stats']['decoded_packets'],1)
+        self.assertTrue(any('unknown interface' in n for n in r['notices']))
+    def test_malformed_later_section(self):
+        first=demo.capture_pcapng([demo.tcp_frame(443)])
+        bad=struct.pack('<II',0x0A0D0D0A,28)+b'\x4d\x3c\x2b\x1a'+struct.pack('<HHq',1,0,-1)+struct.pack('<I',99)
+        self.path.write_bytes(first+bad)
+        r=self.run_report()
+        self.assertEqual(r['stats']['decoded_packets'],1)
+        self.assertTrue(any('Malformed PCAPNG section header' in n for n in r['notices']))
+    def test_later_section_major_version(self):
+        first=demo.capture_pcapng([demo.tcp_frame(443)])
+        body=b'\x4d\x3c\x2b\x1a'+struct.pack('<HHq',2,0,-1)
+        second=demo.block('<',0x0A0D0D0A,body)
+        self.path.write_bytes(first+second)
+        r=self.run_report()
+        self.assertEqual(r['stats']['decoded_packets'],1)
+        self.assertTrue(any('major version' in n for n in r['notices']))
+    def test_section_limit(self):
+        data=self.shb()*(wb.PCAPNG_MAX_SECTIONS+1)
+        self.path.write_bytes(data)
+        r=self.run_report()
+        self.assertEqual(r['stats']['decoded_packets'],0)
+        self.assertTrue(any('Section limit' in n for n in r['notices']))
+    def test_cross_section_scan_alert(self):
+        frames=[demo.tcp_frame(p) for p in range(20,32)]
+        classic=self.run_classic_alert(frames)
+        first=demo.capture_pcapng(frames[:5])
+        out=self.shb()+self.idb(nano=True)
+        for i,data in enumerate(frames[5:],start=5):
+            units=(1767225600+i)*1000000000
+            epb=struct.pack('<IIIII',0,units>>32,units&0xffffffff,len(data),len(data))+data
+            out+=demo.block('<',6,epb)
+        self.path.write_bytes(first+out)
+        r=self.run_report()
+        self.assertEqual(r['stats']['decoded_packets'],12)
+        self.assertEqual(r['alerts'][0]['detected_at'],classic)
+    def run_classic_alert(self,frames):
+        classic_path=Path(self.temp.name)/'classic.pcap'
+        classic_path.write_bytes(demo.capture(frames))
+        return wb.investigate(classic_path)['alerts'][0]['detected_at']
     def test_simple_packet_block_skipped(self):
         frame=demo.tcp_frame(443)
         spb=demo.block('<',3,struct.pack('<I',len(frame))+frame)
