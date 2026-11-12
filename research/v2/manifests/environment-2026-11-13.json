@@ -1,0 +1,332 @@
+{
+  "date": "2026-11-13",
+  "purpose": "Stage 0 provisioning and activation; no research accuracy/performance results",
+  "os": "Ubuntu 22.04.5 LTS x86_64",
+  "python": "3.10.12",
+  "ram_bytes": 2079145984,
+  "engines": {
+    "zeek": {
+      "version": "8.0.11",
+      "package_sha256": "5b76381e270984d7c7d4c815060a65d83016701af0c971a1341e7e3f0ee25a87",
+      "scanner_commit": "35cf19cf64ba9f9989022a56dce0c8ad6ae2f3f2",
+      "darknet_commit": "7564a8f2035aa62359199b64086ff14749f35f73"
+    },
+    "snort": {
+      "version": "3.13.2.0",
+      "commit": "fe29cbe7403acc0dd428065a69d8f29cc311c18e",
+      "libdaq_version": "3.0.29",
+      "libdaq_commit": "c8d4083904f7791f596d853178aca4ef1e20f7d3",
+      "features": "native single-thread build; Hyperscan OFF; LZMA ON; PCRE2; pcap/savefile DAQs enabled; afpacket/netmap/nfq DAQs disabled"
+    },
+    "nmap": {
+      "version": "7.80"
+    },
+    "tshark": {
+      "version": "3.6.2"
+    },
+    "docker": {
+      "version": "29.1.3",
+      "status": "executable installed; daemon smoke NOT successful: managed containerd cannot mkdir /run/containerd; 8-second probe timed out"
+    }
+  },
+  "packages": [
+    {
+      "package": "bison",
+      "version": "2:3.8.2+dfsg-1ubuntu0.22.04.1",
+      "architecture": "amd64",
+      "sha256": "40ba998a24ce53a420fc3f8188b833fde276564df1a7e90acaf875f4f9b76c4e"
+    },
+    {
+      "package": "containerd",
+      "version": "2.2.1-0ubuntu1~22.04.2",
+      "architecture": "amd64",
+      "sha256": "08e309f0fb8ae6f798dc80e54f10e152c8dad6ee16ca6627805382fbb56cb5f1"
+    },
+    {
+      "package": "docker.io",
+      "version": "29.1.3-0ubuntu3~22.04.2",
+      "architecture": "amd64",
+      "sha256": "e2336d2596d18d6e1ae0cb80ae569a86019674b1b995c40a0c734be8081f275e"
+    },
+    {
+      "package": "flex",
+      "version": "2.6.4-8build2",
+      "architecture": "amd64",
+      "sha256": "980674f410fa6cb5e41d1bdf434a9391dcec0ac8fae5194cd90f9598ae074d8d"
+    },
+    {
+      "package": "libbcg729-0",
+      "version": "1.1.1-2",
+      "architecture": "amd64",
+      "sha256": "e9186eb082904b24b60da19e3e7f55a1ac7fc07d5bae17f80b1a836e3b51a8f0"
+    },
+    {
+      "package": "libc-ares2",
+      "version": "1.18.1-1ubuntu0.22.04.4",
+      "architecture": "amd64",
+      "sha256": "f06ba6fa152f36efd393943dc7e80e229cac041b241e6281d20d60ee7dfc14c2"
+    },
+    {
+      "package": "libdbus-1-dev",
+      "version": "1.12.20-2ubuntu4.1",
+      "architecture": "amd64",
+      "sha256": "2ac0848b6b6089e8ec369513a266d3eb84950233bf3e39602de53e159cbdf7d9"
+    },
+    {
+      "package": "libdumbnet-dev",
+      "version": "1.12-10",
+      "architecture": "amd64",
+      "sha256": "219fa4f0b257270414b600de26459be0ffdf0c4025d3d90d5865b669c0c7cdf6"
+    },
+    {
+      "package": "libdumbnet1",
+      "version": "1.12-10",
+      "architecture": "amd64",
+      "sha256": "3ed8743bd2bfdc51c884b27d911a63bdce93ad37b3d85dd0ee64a80649aeb1ee"
+    },
+    {
+      "package": "libfl-dev",
+      "version": "2.6.4-8build2",
+      "architecture": "amd64",
+      "sha256": "8c65612bacfb9a9e03759f80f64ccba1ca977d3511e22c10fd881b55a762efe0"
+    },
+    {
+      "package": "libfl2",
+      "version": "2.6.4-8build2",
+      "architecture": "amd64",
+      "sha256": "b36df0dcc7b3c8769b51790fb37f780a7ca6148448af30ce572ab584ddf8a84a"
+    },
+    {
+      "package": "libhwloc-dev",
+      "version": "2.7.0-2ubuntu1",
+      "architecture": "amd64",
+      "sha256": "a097a8e4596eb3d40a1f069ceab00ea280c527bcd9917fe3f5ae87ec5cdc1b88"
+    },
+    {
+      "package": "libhwloc-plugins",
+      "version": "2.7.0-2ubuntu1",
+      "architecture": "amd64",
+      "sha256": "6c7c59ddf60a49f1b833da4130ffc2c1197808fcec3afacfd8d9f956fe45df1c"
+    },
+    {
+      "package": "libhwloc15",
+      "version": "2.7.0-2ubuntu1",
+      "architecture": "amd64",
+      "sha256": "6749a98e4a12f6f380ee334113cbdc3384a1d8d8af6add254f6557c9a9f9bc28"
+    },
+    {
+      "package": "liblinear4",
+      "version": "2.3.0+dfsg-5",
+      "architecture": "amd64",
+      "sha256": "0f7c3b2aac3b970b7847c2449204b4ced31606071c32a155f8db176c7f17e566"
+    },
+    {
+      "package": "liblua5.2-0",
+      "version": "5.2.4-2",
+      "architecture": "amd64",
+      "sha256": "1e1b380660973cf68db680a548fc5f9db2796ff2e5b7013208332360f17add91"
+    },
+    {
+      "package": "liblua5.3-0",
+      "version": "5.3.6-1build1",
+      "architecture": "amd64",
+      "sha256": "54720e25dccf40c688fe5755b8b741f8c905937c49da67544d59c35192899e39"
+    },
+    {
+      "package": "libluajit-5.1-2",
+      "version": "2.1.0~beta3+dfsg-6ubuntu0.1",
+      "architecture": "amd64",
+      "sha256": "6da782a03320555016f0d74a0ec76f3f2845e188b21c640b130dfb804e527228"
+    },
+    {
+      "package": "libluajit-5.1-common",
+      "version": "2.1.0~beta3+dfsg-6ubuntu0.1",
+      "architecture": "all",
+      "sha256": "9733c3a9c8b6ac2770cecca73adab924238f21e612e17978ff1f85d0066689d4"
+    },
+    {
+      "package": "libluajit-5.1-dev",
+      "version": "2.1.0~beta3+dfsg-6ubuntu0.1",
+      "architecture": "amd64",
+      "sha256": "0e9bd4cb2dea67247bd88c5e8fe05b8f25cedb79b7b619dca2e3a8148399afbf"
+    },
+    {
+      "package": "liblzma-dev",
+      "version": "5.2.5-2ubuntu1.2",
+      "architecture": "amd64",
+      "sha256": "ece71dec77831baa461b407de8e3ef598c30f191c2e833d2a6f96756c9fd0978"
+    },
+    {
+      "package": "liblzma5",
+      "version": "5.2.5-2ubuntu1.2",
+      "architecture": "amd64",
+      "sha256": "a88fca7506963c443c42a578db6c35424336ae28abcdaa60c89f06d30aeb625b"
+    },
+    {
+      "package": "libnuma-dev",
+      "version": "2.0.14-3ubuntu2",
+      "architecture": "amd64",
+      "sha256": "d127bf32ebc3459645bd07fb18dd24f5780f405009589383c533f97d2727643b"
+    },
+    {
+      "package": "libpcap-dev",
+      "version": "1.10.1-4ubuntu1.22.04.2",
+      "architecture": "amd64",
+      "sha256": "f71cff3818aee585eb393b0eb73f0387986fac97407e1cb23f984bf9c92cdded"
+    },
+    {
+      "package": "libpcap0.8-dev",
+      "version": "1.10.1-4ubuntu1.22.04.2",
+      "architecture": "amd64",
+      "sha256": "1686d8f515e7f8c1efe85555d5d39aa524937bca08b16afea7ff742dc352379d"
+    },
+    {
+      "package": "libpcap0.8",
+      "version": "1.10.1-4ubuntu1.22.04.2",
+      "architecture": "amd64",
+      "sha256": "ed84d273eaa990737109b37d5b30403e7c7f394ae59e20904cec0f63debfe3fe"
+    },
+    {
+      "package": "libpcre2-16-0",
+      "version": "10.39-3ubuntu0.2",
+      "architecture": "amd64",
+      "sha256": "b997a34ed0e711292278e917683e604b95099952f6653aa093a6dcbffa9af09f"
+    },
+    {
+      "package": "libpcre2-32-0",
+      "version": "10.39-3ubuntu0.2",
+      "architecture": "amd64",
+      "sha256": "280bb18a48ffcb284a4238aaf755abef252e23b5d38aa0b81ba4427275cb0e83"
+    },
+    {
+      "package": "libpcre2-8-0",
+      "version": "10.39-3ubuntu0.2",
+      "architecture": "amd64",
+      "sha256": "30dff428411080f04c17d3146cecff946bed94f019f912ea3aa1d2630dee610f"
+    },
+    {
+      "package": "libpcre2-dev",
+      "version": "10.39-3ubuntu0.2",
+      "architecture": "amd64",
+      "sha256": "f42511e34d21420ac7d2445b0c7bc697b59d55766a6c1bbbfb9e81569980fba7"
+    },
+    {
+      "package": "libpcre2-posix3",
+      "version": "10.39-3ubuntu0.2",
+      "architecture": "amd64",
+      "sha256": "d8ef35a003106b773ec2c4083935ca8fdf560fc9a86e1cf4e111ad4f32f5426c"
+    },
+    {
+      "package": "libsbc1",
+      "version": "1.5-3build2",
+      "architecture": "amd64",
+      "sha256": "ef30b5d0c1060a59b2632c95736b67a6432f241412ede4b34d2229dfa4c53df6"
+    },
+    {
+      "package": "libsmi2ldbl",
+      "version": "0.4.8+dfsg2-16",
+      "architecture": "amd64",
+      "sha256": "93a11a8b32f1c7e8675db6a1b2cda83db48166a3eb5398f0f0b6e2342b1af6a8"
+    },
+    {
+      "package": "libspandsp2",
+      "version": "0.0.6+dfsg-2",
+      "architecture": "amd64",
+      "sha256": "8d4765d10766d9e69bd3459bbe634848b34e51247e8371b9476020d7b9e24dcf"
+    },
+    {
+      "package": "libssl-dev",
+      "version": "3.0.2-0ubuntu1.30",
+      "architecture": "amd64",
+      "sha256": "8a47dfa7f9bd4d54ac9dc9a1db14891a9133841bf44f12c3db086f2d4321bac6"
+    },
+    {
+      "package": "libssl3",
+      "version": "3.0.2-0ubuntu1.30",
+      "architecture": "amd64",
+      "sha256": "d1b4636e32ac6d3b95d583ac05ac548b1aa248414bae1c51b14f54be0f8fd7bc"
+    },
+    {
+      "package": "libwireshark-data",
+      "version": "3.6.2-2",
+      "architecture": "all",
+      "sha256": "a25fa6a558dca92fd1304df28bbd420f4bb07eb2d422421646fd034330c81680"
+    },
+    {
+      "package": "libwireshark15",
+      "version": "3.6.2-2",
+      "architecture": "amd64",
+      "sha256": "646e199dda3d19355f0711749a8634d29e4f0cb142915f470416738551e5d05e"
+    },
+    {
+      "package": "libwiretap12",
+      "version": "3.6.2-2",
+      "architecture": "amd64",
+      "sha256": "ae5020a0a63f8abfb3f515a9e5e922c3c353f1b713ab9ece96afa0ab0d2dd143"
+    },
+    {
+      "package": "libwsutil13",
+      "version": "3.6.2-2",
+      "architecture": "amd64",
+      "sha256": "f235d313b89ab863bcf8c3ebd360292e22178934e6e651943910db65a9feb95c"
+    },
+    {
+      "package": "lua-lpeg",
+      "version": "1.0.2-1",
+      "architecture": "amd64",
+      "sha256": "8425c419bda326107877fc3f7f4b50a59e5b7fee136c8e2fad4980b2ca7cdcda"
+    },
+    {
+      "package": "nmap-common",
+      "version": "7.91+dfsg1+really7.80+dfsg1-2ubuntu0.1",
+      "architecture": "all",
+      "sha256": "a47b4ad48c3fc9b7ff662e60c013933289d8cbd7bce7e3f775d4bd1c2d3a79b3"
+    },
+    {
+      "package": "nmap",
+      "version": "7.91+dfsg1+really7.80+dfsg1-2ubuntu0.1",
+      "architecture": "amd64",
+      "sha256": "f00d0d4726c4d985c7b26b92ebfa2ce7fdafb5b51c6b13714633d01dfc38a75b"
+    },
+    {
+      "package": "runc",
+      "version": "1.3.4-0ubuntu1~22.04.1",
+      "architecture": "amd64",
+      "sha256": "1551d41d027969e141805f9687adcba746c332fa64e3c7ceb9261f842a33ff31"
+    },
+    {
+      "package": "tshark",
+      "version": "3.6.2-2",
+      "architecture": "amd64",
+      "sha256": "75265033eb99c64721fa1886b2634a054ddac0c97caa1828ac8310abce77e115"
+    },
+    {
+      "package": "wireshark-common",
+      "version": "3.6.2-2",
+      "architecture": "amd64",
+      "sha256": "b95045d103440381ff92cc9f2a5f8bf69b2e85c31a66a6e7a39de6e62447b345"
+    },
+    {
+      "package": "zeek-8.0-core",
+      "version": "1:8.0.11-0",
+      "architecture": "amd64",
+      "sha256": "5b76381e270984d7c7d4c815060a65d83016701af0c971a1341e7e3f0ee25a87"
+    }
+  ],
+  "activation_control_manifest": {
+    "purpose": "baseline activation only; not held-out research data",
+    "linktype": 1,
+    "checksums": "IPv4 and TCP independently asserted valid",
+    "positive": {
+      "filename": "positive.pcap",
+      "packets": 600,
+      "sha256": "444641f7d8b70237b4487c9775a437e649b98224d18927458e1e6db46723ba8e"
+    },
+    "negative": {
+      "filename": "negative.pcap",
+      "packets": 64,
+      "sha256": "f1babb767bff24579996482bbbc9f08bdda9a1520da13f58dd82c640a02cc72d"
+    }
+  },
+  "gate_A": "OPEN: evaluator contract/adapters/tests pending"
+}
