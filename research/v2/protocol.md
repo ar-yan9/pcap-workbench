@@ -1,6 +1,6 @@
 # Port-scan v2 evaluation protocol
 
-Protocol version: 0.1, 13 November 2026. Status: preregistered design, Gate A OPEN. No v2 accuracy, baseline-comparison or performance results exist yet. Changes after pilot work require a dated amendment stating what was observed and which data remain held out.
+Protocol version: 0.2, 13 November 2026. Status: preregistered design, Gate A OPEN. No v2 accuracy, baseline-comparison or performance results exist yet. Changes after pilot work require a dated amendment stating what was observed and which data remain held out.
 
 ## Scope and immutable starting point
 
@@ -14,7 +14,7 @@ Supported scope to implement: Ethernet IPv4/IPv6 TCP vertical SYN, horizontal SY
 
 `research/v2/` contains `protocol.md`, `configs/`, `manifests/`, `generators/`, `runners/`, `adapters/`, `tests/`, `results/raw/`, `analysis/` and `paper/`. Populate these as each component becomes executable; this layout is not a claim that the components already exist. Real payloads and identity maps remain outside the public repository. Synthetic PCAPs may be generated locally; publish code and permitted derived data, not captures.
 
-Each run manifest records source commit, engine and build pin, configuration and corpus/label SHA-256, exact argument vector, seed/split, UTC start/end, exit status, resource limit, actual input/decoded counts, skip/truncation counters and raw-output reference. A nonzero exit, missing expected output, unread packets or limit hit is a failed/incomplete run, never a zero-alert success. Raw outputs are immutable; analysis creates new files.
+Each run manifest records source commit, engine and build pin, configuration and corpus/label SHA-256, exact argument vector, seed/split, UTC start/end, exit status, resource limit, actual input/decoded counts, skip/truncation counters and raw-output reference. A failed exit (interpreted using the engine's documented exit-code contract), missing expected output, unread packets or limit hit is a failed/incomplete run, never a zero-alert success. In particular, the workbench intentionally uses exit 1 for completed runs with alerts; do not classify that as engine failure. Raw outputs are immutable; analysis creates new files.
 
 ## Detector contract to implement before test runs
 
@@ -38,7 +38,7 @@ Public validation: original CIC-IDS2017 PCAP plus corresponding labels, not feat
 
 Zeek candidate: 8.0.11, upstream OBS Ubuntu 22.04 amd64 core package. Snort candidate: 3.13.2.0 tag (`fe29cbe7403acc0dd428065a69d8f29cc311c18e`) with LibDAQ 3.0.29 (`c8d4083904f7791f596d853178aca4ef1e20f7d3`). These are selected pins, not a claim that controls passed. Save package/build digests, compile features, exact configuration and logger help. Snort 2 is not a substitute. Docker is a possible provisioning mechanism, not a scientific baseline or prerequisite if native offline binaries work.
 
-Zeek explicitly loads `policy/misc/scan`; record installed policy defaults and failed-connection semantics. Snort explicitly activates its `port_scan` inspector, validates configuration with `-T`, and saves inspector/logger help plus raw alerts and packet counters. Primary baseline runs are single-threaded default configurations; development-selected tuning is a separately labeled comparison. Do not equate Snort sensitivity numerically to W/T.
+Amendment A1: Zeek 8.0.11 explicitly loads pinned `packages/bro-simple-scan` with pinned `bro-is-darknet`; record installed package defaults and failed-connection semantics. The retired in-tree `policy/misc/scan` is not present in this release and is not used. Snort explicitly activates its `port_scan` inspector, validates configuration with `-T`, and saves inspector/logger help plus raw alerts and packet counters. Primary baseline runs are single-threaded default configurations; development-selected tuning is a separately labeled comparison. Do not equate Snort sensitivity numerically to W/T.
 
 For every engine, before evaluation, use valid-checksum positive and negative PCAP controls. Positive must contain enough closed-port/rejected probes to exercise the actual policy; negative must have ordinary complete sessions and few-port retries. Assert packets were read and expected positive alerts exist. Zero output from an inactive inspector fails activation. Keep control fixtures independent of held-out performance data. Both controls, adapters and existing tests must pass for Gate A.
 
@@ -65,3 +65,11 @@ A: current 47 tests and frozen 9 evaluator tests/verify pass; protocol and evalu
 Initial reproduction on 13 November 2026: current 47/47 tests pass; frozen verify.py regenerates the 986-packet fixture, eight metric rows and manifest hashes; 9/9 frozen evaluator tests pass. These are historical reproduction results only. Baseline controls, new corpus and v2 experiments are pending. No favorable outcome is promised.
 
 Official provisioning references inspected: https://github.com/zeek/zeek/wiki/Binary-Packages ; https://docs.snort.org/start/installation ; https://www.snort.org/downloads.html . Full research-plan source ledger is maintained separately. Next amendment closes evaluator/parameter details before any held-out data access.
+
+## Amendment A1: current Zeek package, 13 November 2026
+
+Before held-out generation or scoring, installed-engine inspection found that `policy/misc/scan` was removed from Zeek in 6.1. The historical v6.0.9 reference cannot define a Zeek 8.0.11 baseline. Use Zeek 8.0.11 + bro-simple-scan commit `35cf19cf64ba9f9989022a56dce0c8ad6ae2f3f2` + bro-is-darknet commit `7564a8f2035aa62359199b64086ff14749f35f73`. Label all tables as package-based Zeek, not stock/retired scan policy. This changes the baseline semantics: default remote/local thresholds 25/250 unique host-port failures, 15-minute inactivity timeout and one-hour suppression. Do not present these as the old 15-port/25-host five-minute policy.
+
+Activation pilot: an initial 120-refusal trace failed Zeek's positive assertion because documentation ranges are local under installed defaults. Preserve that failure. Increasing the control to 300 refusals made both engines alert without lowering any threshold. This is a development activation-control change, not a held-out corpus change. Final controls are 600 positive and 64 negative packets; both engines pass, with all IPv4/TCP checksums independently verified by TShark. Zeek warns that both deliberately control-only fixtures may be prefiltered; do not suppress or treat this smoke test as realistic traffic evidence. Gate A remains OPEN pending the independent evaluator contract/adapters/tests.
+
+Sources: https://community.zeek.org/t/scan-address-scan-scan-port-scan/7720 ; https://zeek.org/2026/09/how-attackers-learn-your-network-before-they-attack-it/ . No held-out data, lab captures, CIC scoring, v2 feature implementation or performance comparisons were performed before this amendment.
