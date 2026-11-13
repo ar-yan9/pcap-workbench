@@ -130,12 +130,12 @@ def check_snort(directory, expected_packets, positive):
 
 
 def require_version(name, text):
-    patterns = {'zeek': r'\bversion 8\.0\.11\b',
-                'snort': r'\bVersion 3\.13\.2\.0\b',
-                'tshark': r'TShark \(Wireshark\) 3\.6\.2\b'}
+    patterns = {'zeek': r'\bversion 8\.0\.11(?=\s|$)',
+                'snort': r'\bVersion 3\.13\.2\.0(?=\s|$)',
+                'tshark': r'TShark \(Wireshark\) 3\.6\.2(?=\s|$)'}
     require(re.search(patterns[name], text) is not None, 'wrong version for ' + name)
     if name == 'snort':
-        require(re.search(r'Using DAQ version 3\.0\.29\.0\b', text) is not None,
+        require(re.search(r'Using DAQ version 3\.0\.29\.0(?=\s|$)', text) is not None,
                 'wrong LibDAQ version')
 
 
