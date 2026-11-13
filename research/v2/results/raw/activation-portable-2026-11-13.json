@@ -1,0 +1,375 @@
+{
+  "purpose": "fresh published-source offline activation, not research accuracy/performance",
+  "source_manifest_sha256": "99e0c608bc238995aea6cf0dce912fd13719500fce3a07da06454d0b1ff6738d",
+  "path_normalization": "Absolute execution root replaced by $RUN_ROOT in display values. Hashes remain original file hashes; no capture bytes included.",
+  "manifest": {
+    "purpose": "activation controls only, not research accuracy/performance",
+    "status": "passed",
+    "start_utc": "2026-11-13T03:29:41.122979+00:00",
+    "commands": [
+      {
+        "argv": [
+          "$RUN_ROOT/prefix/opt/zeek/bin/zeek",
+          "--version"
+        ],
+        "start_utc": "2026-11-13T03:29:41.351021+00:00",
+        "end_utc": "2026-11-13T03:29:41.358477+00:00",
+        "elapsed_seconds": 0.007456846999957634,
+        "exit_code": 0,
+        "timed_out": false,
+        "stdout": "version-zeek.stdout",
+        "stderr": "version-zeek.stderr"
+      },
+      {
+        "argv": [
+          "$RUN_ROOT/prefix/bin/snort",
+          "-V"
+        ],
+        "start_utc": "2026-11-13T03:29:41.358620+00:00",
+        "end_utc": "2026-11-13T03:29:41.366146+00:00",
+        "elapsed_seconds": 0.007532394000008935,
+        "exit_code": 0,
+        "timed_out": false,
+        "stdout": "version-snort.stdout",
+        "stderr": "version-snort.stderr"
+      },
+      {
+        "argv": [
+          "$RUN_ROOT/prefix/usr/bin/tshark",
+          "--version"
+        ],
+        "start_utc": "2026-11-13T03:29:41.366388+00:00",
+        "end_utc": "2026-11-13T03:29:41.480301+00:00",
+        "elapsed_seconds": 0.1139197160000549,
+        "exit_code": 0,
+        "timed_out": false,
+        "stdout": "version-tshark.stdout",
+        "stderr": "version-tshark.stderr"
+      },
+      {
+        "argv": [
+          "$RUN_ROOT/prefix/bin/snort",
+          "--daq-dir",
+          "$RUN_ROOT/prefix/lib/daq",
+          "-T",
+          "-c",
+          "$RUN_ROOT/activation-published-20261113-final/snort.lua"
+        ],
+        "start_utc": "2026-11-13T03:29:41.486106+00:00",
+        "end_utc": "2026-11-13T03:29:41.517775+00:00",
+        "elapsed_seconds": 0.03167143899986513,
+        "exit_code": 0,
+        "timed_out": false,
+        "stdout": "validate-snort.stdout",
+        "stderr": "validate-snort.stderr"
+      },
+      {
+        "argv": [
+          "$RUN_ROOT/prefix/usr/bin/tshark",
+          "-r",
+          "$RUN_ROOT/activation-published-20261113-final/pcaps/positive.pcap",
+          "-o",
+          "tcp.check_checksum:TRUE",
+          "-o",
+          "ip.check_checksum:TRUE",
+          "-T",
+          "fields",
+          "-e",
+          "frame.number",
+          "-e",
+          "tcp.checksum.status",
+          "-e",
+          "ip.checksum.status"
+        ],
+        "start_utc": "2026-11-13T03:29:41.517810+00:00",
+        "end_utc": "2026-11-13T03:29:41.631712+00:00",
+        "elapsed_seconds": 0.11391105300003801,
+        "exit_code": 0,
+        "timed_out": false,
+        "stdout": "checksum-positive.stdout",
+        "stderr": "checksum-positive.stderr"
+      },
+      {
+        "argv": [
+          "$RUN_ROOT/prefix/opt/zeek/bin/zeek",
+          "-r",
+          "$RUN_ROOT/activation-published-20261113-final/pcaps/positive.pcap",
+          "$RUN_ROOT/activation-published-20261113-final/scanner.zeek"
+        ],
+        "start_utc": "2026-11-13T03:29:41.632024+00:00",
+        "end_utc": "2026-11-13T03:29:41.896116+00:00",
+        "elapsed_seconds": 0.26409975299998223,
+        "exit_code": 0,
+        "timed_out": false,
+        "stdout": "run.stdout",
+        "stderr": "run.stderr",
+        "directory": "zeek-positive"
+      },
+      {
+        "argv": [
+          "$RUN_ROOT/prefix/bin/snort",
+          "--daq-dir",
+          "$RUN_ROOT/prefix/lib/daq",
+          "-c",
+          "$RUN_ROOT/activation-published-20261113-final/snort.lua",
+          "-r",
+          "$RUN_ROOT/activation-published-20261113-final/pcaps/positive.pcap",
+          "-l",
+          "$RUN_ROOT/activation-published-20261113-final/snort-positive"
+        ],
+        "start_utc": "2026-11-13T03:29:41.896917+00:00",
+        "end_utc": "2026-11-13T03:29:41.960668+00:00",
+        "elapsed_seconds": 0.06375574300000153,
+        "exit_code": 0,
+        "timed_out": false,
+        "stdout": "run.stdout",
+        "stderr": "run.stderr",
+        "directory": "snort-positive"
+      },
+      {
+        "argv": [
+          "$RUN_ROOT/prefix/usr/bin/tshark",
+          "-r",
+          "$RUN_ROOT/activation-published-20261113-final/pcaps/negative.pcap",
+          "-o",
+          "tcp.check_checksum:TRUE",
+          "-o",
+          "ip.check_checksum:TRUE",
+          "-T",
+          "fields",
+          "-e",
+          "frame.number",
+          "-e",
+          "tcp.checksum.status",
+          "-e",
+          "ip.checksum.status"
+        ],
+        "start_utc": "2026-11-13T03:29:41.961160+00:00",
+        "end_utc": "2026-11-13T03:29:42.075012+00:00",
+        "elapsed_seconds": 0.11385582799994154,
+        "exit_code": 0,
+        "timed_out": false,
+        "stdout": "checksum-negative.stdout",
+        "stderr": "checksum-negative.stderr"
+      },
+      {
+        "argv": [
+          "$RUN_ROOT/prefix/opt/zeek/bin/zeek",
+          "-r",
+          "$RUN_ROOT/activation-published-20261113-final/pcaps/negative.pcap",
+          "$RUN_ROOT/activation-published-20261113-final/scanner.zeek"
+        ],
+        "start_utc": "2026-11-13T03:29:42.075137+00:00",
+        "end_utc": "2026-11-13T03:29:42.289289+00:00",
+        "elapsed_seconds": 0.21415999099986038,
+        "exit_code": 0,
+        "timed_out": false,
+        "stdout": "run.stdout",
+        "stderr": "run.stderr",
+        "directory": "zeek-negative"
+      },
+      {
+        "argv": [
+          "$RUN_ROOT/prefix/bin/snort",
+          "--daq-dir",
+          "$RUN_ROOT/prefix/lib/daq",
+          "-c",
+          "$RUN_ROOT/activation-published-20261113-final/snort.lua",
+          "-r",
+          "$RUN_ROOT/activation-published-20261113-final/pcaps/negative.pcap",
+          "-l",
+          "$RUN_ROOT/activation-published-20261113-final/snort-negative"
+        ],
+        "start_utc": "2026-11-13T03:29:42.289462+00:00",
+        "end_utc": "2026-11-13T03:29:42.353369+00:00",
+        "elapsed_seconds": 0.06391411799995694,
+        "exit_code": 0,
+        "timed_out": false,
+        "stdout": "run.stdout",
+        "stderr": "run.stderr",
+        "directory": "snort-negative"
+      }
+    ],
+    "checks": {
+      "checksum-positive": {
+        "packets": 600,
+        "ipv4_good": 600,
+        "tcp_good": 600
+      },
+      "zeek-positive": {
+        "connections": 300,
+        "accounted_packets": 600,
+        "scan_alerts": 1,
+        "scan_records": [
+          {
+            "ts": "1700000024.910000",
+            "uid": "-",
+            "id.orig_h": "-",
+            "id.orig_p": "-",
+            "id.resp_h": "-",
+            "id.resp_p": "-",
+            "fuid": "-",
+            "file_mime_type": "-",
+            "file_desc": "-",
+            "proto": "-",
+            "note": "Scan::Port_Scan",
+            "msg": "192.0.2.1 scanned at least 250 unique ports on host 198.51.100.2 in 0m25s",
+            "sub": "local",
+            "src": "192.0.2.1",
+            "dst": "-",
+            "p": "-",
+            "n": "-",
+            "peer_descr": "-",
+            "actions": "Notice::ACTION_LOG",
+            "email_dest": "(empty)",
+            "suppress_for": "3600.000000",
+            "remote_location.country_code": "-",
+            "remote_location.region": "-",
+            "remote_location.city": "-",
+            "remote_location.latitude": "-",
+            "remote_location.longitude": "-"
+          }
+        ]
+      },
+      "snort-positive": {
+        "received": 600,
+        "analyzed": 600,
+        "scan_alerts": 1,
+        "scan_records": [
+          {
+            "timestamp": "11/14-22:13:21.400000",
+            "seconds": 1700000001,
+            "pkt_num": 29,
+            "proto": "TCP",
+            "src_addr": "192.0.2.1",
+            "dst_addr": "198.51.100.2",
+            "src_port": 40014,
+            "dst_port": 1014,
+            "gid": 122,
+            "sid": 1,
+            "msg": "(port_scan) TCP portscan"
+          }
+        ]
+      },
+      "checksum-negative": {
+        "packets": 64,
+        "ipv4_good": 64,
+        "tcp_good": 64
+      },
+      "zeek-negative": {
+        "connections": 12,
+        "accounted_packets": 64,
+        "scan_alerts": 0,
+        "scan_records": []
+      },
+      "snort-negative": {
+        "received": 64,
+        "analyzed": 64,
+        "scan_alerts": 0,
+        "scan_records": []
+      }
+    },
+    "source_revision": "74a17f9f488f2a7846753bd97d3cbbbbcbf483e5",
+    "binary_sha256": {
+      "zeek": "c3cc06504947ed091c0016b3bb35b6623212f39747ef2b2b703745183f8524aa",
+      "snort": "46f3c5e13fcd13460bf89f20d232c94c16863760d6981891679f1576f77e2a3a",
+      "tshark": "a65608d17a78f255c7a9aaa08244f3fe284ce752f6818fd87fee9ca6e5bb4d54"
+    },
+    "runner_sha256": "9173e864786bfeb66d288308ddf5629be85e86550d89c8d6d8558cce62bd6435",
+    "generator_sha256": "285c609c2e76be5a220027fdeec6f074b64c6a9aebb8ce2c98b712ae51764e2f",
+    "source_dirty": false,
+    "scanner_pins": {
+      "bro-simple-scan": "35cf19cf64ba9f9989022a56dce0c8ad6ae2f3f2",
+      "bro-is-darknet": "7564a8f2035aa62359199b64086ff14749f35f73"
+    },
+    "corpus": {
+      "purpose": "baseline activation only; not held-out research data",
+      "linktype": 1,
+      "checksums": "IPv4 and TCP independently asserted valid",
+      "positive": {
+        "filename": "positive.pcap",
+        "packets": 600,
+        "sha256": "444641f7d8b70237b4487c9775a437e649b98224d18927458e1e6db46723ba8e"
+      },
+      "negative": {
+        "filename": "negative.pcap",
+        "packets": 64,
+        "sha256": "f1babb767bff24579996482bbbc9f08bdda9a1520da13f58dd82c640a02cc72d"
+      }
+    },
+    "config_sha256": {
+      "zeek_loader": "c0c3c4b3c9cfa82be865f9ac31174817f94e473409612c00071c4058545f2dd2",
+      "snort_control": "639b9dbe5086c0f9920a9105ba1ce831b73929dbf1855f7758f11f587fc40fe7",
+      "snort_defaults": "6dc2ec6f286c374678ed907bd18bf2e4ea1f9f4437a82cd31af361974ecac9bf",
+      "snort_main": "ae242e7b84ac05b20f4b3393bfaea1ac3f161e8dbbce48819ea27dfcecec6f48"
+    },
+    "end_utc": "2026-11-13T03:29:42.353528+00:00",
+    "file_sha256": {
+      "checksum-negative.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "checksum-negative.stdout": "4c856d3bbd14f96f25ddbb3a935d8698e35f2393f82bff56de14c3be92687a36",
+      "checksum-positive.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "checksum-positive.stdout": "5c6b117198da971388ce73eb716fca3d7afdc44d325e371d0ceb67069aecdef1",
+      "pcaps/manifest.json": "18560091c785ef6544b885a7c91e76fd142b88c52f68bb887ec6139b3efb8614",
+      "pcaps/negative.pcap": "f1babb767bff24579996482bbbc9f08bdda9a1520da13f58dd82c640a02cc72d",
+      "pcaps/positive.pcap": "444641f7d8b70237b4487c9775a437e649b98224d18927458e1e6db46723ba8e",
+      "scanner.zeek": "c0c3c4b3c9cfa82be865f9ac31174817f94e473409612c00071c4058545f2dd2",
+      "snort-negative/alert_json.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "snort-negative/run.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "snort-negative/run.stdout": "7707b8e6ee722168868079d36dbb783d596ceac960d19d194fd99906bc147e17",
+      "snort-positive/alert_json.txt": "4618df59fa5806d509331a6cd15632947ba002a77936c492bfb13523d8d4c9cd",
+      "snort-positive/run.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "snort-positive/run.stdout": "dbb11d05944829a158ea4fda23f7995b980727db7520a4ffe29f0753bf903d1e",
+      "snort.lua": "639b9dbe5086c0f9920a9105ba1ce831b73929dbf1855f7758f11f587fc40fe7",
+      "validate-snort.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validate-snort.stdout": "89cb5a4179efcfbdbc60d51350481aee0af1edaa44c757fd5220ccefc333c468",
+      "version-snort.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "version-snort.stdout": "8b92d4dbcf56d241b6bb33a398ccafe3fbfddb7cfc750ff484b4806cc72deb34",
+      "version-tshark.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "version-tshark.stdout": "09da162031d727c031412a52909e3c07f23b6e866d4664685a68d2917d3f504b",
+      "version-zeek.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "version-zeek.stdout": "833924994de6ff4218af43cdba97533c632a5b28bf65b43da5ee6440c2b80301",
+      "zeek-negative/conn.log": "96a26ef68b10d41837bc802029c036d2ad82384f65ffaa64e119785f1ee2a75f",
+      "zeek-negative/packet_filter.log": "1662e83162ede56835c437058cb7df078998b50e1c9ab01c1f1d25136835ca13",
+      "zeek-negative/reporter.log": "da642c0805b0820ce2a813626828acb4d42972df4925afb1040642b84cae9cba",
+      "zeek-negative/run.stderr": "6b808a6a9b1037e54c1593913b81537f74a8559a5ab199aea7df8f641a26fbb1",
+      "zeek-negative/run.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "zeek-positive/conn.log": "25e1c34c59f2a41105965faf7fd7c05149166e98acedbe7a829ab65ab39e17a7",
+      "zeek-positive/notice.log": "3b6e13886655420a902b026652909fd6e65848d4c31ef021ece672914f5e3988",
+      "zeek-positive/packet_filter.log": "e6e6afc2a53bc48be3b870c02e6492346485d8d7faf3dc26e77cd53e9c99c7d3",
+      "zeek-positive/reporter.log": "6ecebac9c4a442bd66a474834a7bc1c2c915db458f6013f5167451410a921f28",
+      "zeek-positive/run.stderr": "9b925c21f49f7cfd350e1f4aed0d5b6d574c3de7e69714ddb2e79ad759a5de49",
+      "zeek-positive/run.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "raw_text": {
+    "version-snort.stderr": "",
+    "version-tshark.stdout": "TShark (Wireshark) 3.6.2 (Git v3.6.2 packaged as 3.6.2-2)\n\nCopyright 1998-2022 Gerald Combs <gerald@wireshark.org> and contributors.\nLicense GPLv2+: GNU GPL version 2 or later <https://www.gnu.org/licenses/gpl-2.0.html>\nThis is free software; see the source for copying conditions. There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\nCompiled (64-bit) using GCC 11.2.0, with libpcap, with POSIX capabilities\n(Linux), with libnl 3, with GLib 2.71.2, with zlib 1.2.11, with Lua 5.2.4, with\nGnuTLS 3.7.3 and PKCS #11 support, with Gcrypt 1.9.4, with MIT Kerberos, with\nMaxMind DB resolver, with nghttp2 1.43.0, with brotli, with LZ4, with Zstandard,\nwith Snappy, with libxml2 2.9.12, with libsmi 0.4.8.\n\nRunning on Linux 6.1.189+, with Intel(R) Xeon(R) Processor (with SSE4.2), with\n1982 MB of physical memory, with GLib 2.72.4, with zlib 1.2.11, with libpcap\n1.10.1 (with TPACKET_V3), with c-ares 1.18.1, with GnuTLS 3.7.3, with Gcrypt\n1.9.4, with nghttp2 1.43.0, with brotli 1.0.9, with LZ4 1.9.3, with Zstandard\n1.4.8, with libsmi 0.4.8, with LC_TYPE=C.UTF-8, binary plugins supported (0\nloaded).\n",
+    "version-snort.stdout": "\n   ,,_     -*> Snort++ <*-\n  o\"  )~   Version 3.13.2.0\n   ''''    By Martin Roesch & The Snort Team\n           http://snort.org/contact#team\n           Copyright (C) 2014-2026 Cisco and/or its affiliates. All rights reserved.\n           Copyright (C) 1998-2013 Sourcefire, Inc., et al.\n           Using DAQ version 3.0.29.0\n           Using libpcap version 1.10.1 (with TPACKET_V3)\n           Using LuaJIT version 2.1.0-beta3\n           Using LZMA version 5.2.5\n           Using OpenSSL 3.0.2 15 Mar 2022\n           Using PCRE2 version 10.39 2021-10-29\n           Using ZLIB version 1.2.11\n\n",
+    "checksum-positive.stdout": "1\t1\t1\n2\t1\t1\n3\t1\t1\n4\t1\t1\n5\t1\t1\n6\t1\t1\n7\t1\t1\n8\t1\t1\n9\t1\t1\n10\t1\t1\n11\t1\t1\n12\t1\t1\n13\t1\t1\n14\t1\t1\n15\t1\t1\n16\t1\t1\n17\t1\t1\n18\t1\t1\n19\t1\t1\n20\t1\t1\n21\t1\t1\n22\t1\t1\n23\t1\t1\n24\t1\t1\n25\t1\t1\n26\t1\t1\n27\t1\t1\n28\t1\t1\n29\t1\t1\n30\t1\t1\n31\t1\t1\n32\t1\t1\n33\t1\t1\n34\t1\t1\n35\t1\t1\n36\t1\t1\n37\t1\t1\n38\t1\t1\n39\t1\t1\n40\t1\t1\n41\t1\t1\n42\t1\t1\n43\t1\t1\n44\t1\t1\n45\t1\t1\n46\t1\t1\n47\t1\t1\n48\t1\t1\n49\t1\t1\n50\t1\t1\n51\t1\t1\n52\t1\t1\n53\t1\t1\n54\t1\t1\n55\t1\t1\n56\t1\t1\n57\t1\t1\n58\t1\t1\n59\t1\t1\n60\t1\t1\n61\t1\t1\n62\t1\t1\n63\t1\t1\n64\t1\t1\n65\t1\t1\n66\t1\t1\n67\t1\t1\n68\t1\t1\n69\t1\t1\n70\t1\t1\n71\t1\t1\n72\t1\t1\n73\t1\t1\n74\t1\t1\n75\t1\t1\n76\t1\t1\n77\t1\t1\n78\t1\t1\n79\t1\t1\n80\t1\t1\n81\t1\t1\n82\t1\t1\n83\t1\t1\n84\t1\t1\n85\t1\t1\n86\t1\t1\n87\t1\t1\n88\t1\t1\n89\t1\t1\n90\t1\t1\n91\t1\t1\n92\t1\t1\n93\t1\t1\n94\t1\t1\n95\t1\t1\n96\t1\t1\n97\t1\t1\n98\t1\t1\n99\t1\t1\n100\t1\t1\n101\t1\t1\n102\t1\t1\n103\t1\t1\n104\t1\t1\n105\t1\t1\n106\t1\t1\n107\t1\t1\n108\t1\t1\n109\t1\t1\n110\t1\t1\n111\t1\t1\n112\t1\t1\n113\t1\t1\n114\t1\t1\n115\t1\t1\n116\t1\t1\n117\t1\t1\n118\t1\t1\n119\t1\t1\n120\t1\t1\n121\t1\t1\n122\t1\t1\n123\t1\t1\n124\t1\t1\n125\t1\t1\n126\t1\t1\n127\t1\t1\n128\t1\t1\n129\t1\t1\n130\t1\t1\n131\t1\t1\n132\t1\t1\n133\t1\t1\n134\t1\t1\n135\t1\t1\n136\t1\t1\n137\t1\t1\n138\t1\t1\n139\t1\t1\n140\t1\t1\n141\t1\t1\n142\t1\t1\n143\t1\t1\n144\t1\t1\n145\t1\t1\n146\t1\t1\n147\t1\t1\n148\t1\t1\n149\t1\t1\n150\t1\t1\n151\t1\t1\n152\t1\t1\n153\t1\t1\n154\t1\t1\n155\t1\t1\n156\t1\t1\n157\t1\t1\n158\t1\t1\n159\t1\t1\n160\t1\t1\n161\t1\t1\n162\t1\t1\n163\t1\t1\n164\t1\t1\n165\t1\t1\n166\t1\t1\n167\t1\t1\n168\t1\t1\n169\t1\t1\n170\t1\t1\n171\t1\t1\n172\t1\t1\n173\t1\t1\n174\t1\t1\n175\t1\t1\n176\t1\t1\n177\t1\t1\n178\t1\t1\n179\t1\t1\n180\t1\t1\n181\t1\t1\n182\t1\t1\n183\t1\t1\n184\t1\t1\n185\t1\t1\n186\t1\t1\n187\t1\t1\n188\t1\t1\n189\t1\t1\n190\t1\t1\n191\t1\t1\n192\t1\t1\n193\t1\t1\n194\t1\t1\n195\t1\t1\n196\t1\t1\n197\t1\t1\n198\t1\t1\n199\t1\t1\n200\t1\t1\n201\t1\t1\n202\t1\t1\n203\t1\t1\n204\t1\t1\n205\t1\t1\n206\t1\t1\n207\t1\t1\n208\t1\t1\n209\t1\t1\n210\t1\t1\n211\t1\t1\n212\t1\t1\n213\t1\t1\n214\t1\t1\n215\t1\t1\n216\t1\t1\n217\t1\t1\n218\t1\t1\n219\t1\t1\n220\t1\t1\n221\t1\t1\n222\t1\t1\n223\t1\t1\n224\t1\t1\n225\t1\t1\n226\t1\t1\n227\t1\t1\n228\t1\t1\n229\t1\t1\n230\t1\t1\n231\t1\t1\n232\t1\t1\n233\t1\t1\n234\t1\t1\n235\t1\t1\n236\t1\t1\n237\t1\t1\n238\t1\t1\n239\t1\t1\n240\t1\t1\n241\t1\t1\n242\t1\t1\n243\t1\t1\n244\t1\t1\n245\t1\t1\n246\t1\t1\n247\t1\t1\n248\t1\t1\n249\t1\t1\n250\t1\t1\n251\t1\t1\n252\t1\t1\n253\t1\t1\n254\t1\t1\n255\t1\t1\n256\t1\t1\n257\t1\t1\n258\t1\t1\n259\t1\t1\n260\t1\t1\n261\t1\t1\n262\t1\t1\n263\t1\t1\n264\t1\t1\n265\t1\t1\n266\t1\t1\n267\t1\t1\n268\t1\t1\n269\t1\t1\n270\t1\t1\n271\t1\t1\n272\t1\t1\n273\t1\t1\n274\t1\t1\n275\t1\t1\n276\t1\t1\n277\t1\t1\n278\t1\t1\n279\t1\t1\n280\t1\t1\n281\t1\t1\n282\t1\t1\n283\t1\t1\n284\t1\t1\n285\t1\t1\n286\t1\t1\n287\t1\t1\n288\t1\t1\n289\t1\t1\n290\t1\t1\n291\t1\t1\n292\t1\t1\n293\t1\t1\n294\t1\t1\n295\t1\t1\n296\t1\t1\n297\t1\t1\n298\t1\t1\n299\t1\t1\n300\t1\t1\n301\t1\t1\n302\t1\t1\n303\t1\t1\n304\t1\t1\n305\t1\t1\n306\t1\t1\n307\t1\t1\n308\t1\t1\n309\t1\t1\n310\t1\t1\n311\t1\t1\n312\t1\t1\n313\t1\t1\n314\t1\t1\n315\t1\t1\n316\t1\t1\n317\t1\t1\n318\t1\t1\n319\t1\t1\n320\t1\t1\n321\t1\t1\n322\t1\t1\n323\t1\t1\n324\t1\t1\n325\t1\t1\n326\t1\t1\n327\t1\t1\n328\t1\t1\n329\t1\t1\n330\t1\t1\n331\t1\t1\n332\t1\t1\n333\t1\t1\n334\t1\t1\n335\t1\t1\n336\t1\t1\n337\t1\t1\n338\t1\t1\n339\t1\t1\n340\t1\t1\n341\t1\t1\n342\t1\t1\n343\t1\t1\n344\t1\t1\n345\t1\t1\n346\t1\t1\n347\t1\t1\n348\t1\t1\n349\t1\t1\n350\t1\t1\n351\t1\t1\n352\t1\t1\n353\t1\t1\n354\t1\t1\n355\t1\t1\n356\t1\t1\n357\t1\t1\n358\t1\t1\n359\t1\t1\n360\t1\t1\n361\t1\t1\n362\t1\t1\n363\t1\t1\n364\t1\t1\n365\t1\t1\n366\t1\t1\n367\t1\t1\n368\t1\t1\n369\t1\t1\n370\t1\t1\n371\t1\t1\n372\t1\t1\n373\t1\t1\n374\t1\t1\n375\t1\t1\n376\t1\t1\n377\t1\t1\n378\t1\t1\n379\t1\t1\n380\t1\t1\n381\t1\t1\n382\t1\t1\n383\t1\t1\n384\t1\t1\n385\t1\t1\n386\t1\t1\n387\t1\t1\n388\t1\t1\n389\t1\t1\n390\t1\t1\n391\t1\t1\n392\t1\t1\n393\t1\t1\n394\t1\t1\n395\t1\t1\n396\t1\t1\n397\t1\t1\n398\t1\t1\n399\t1\t1\n400\t1\t1\n401\t1\t1\n402\t1\t1\n403\t1\t1\n404\t1\t1\n405\t1\t1\n406\t1\t1\n407\t1\t1\n408\t1\t1\n409\t1\t1\n410\t1\t1\n411\t1\t1\n412\t1\t1\n413\t1\t1\n414\t1\t1\n415\t1\t1\n416\t1\t1\n417\t1\t1\n418\t1\t1\n419\t1\t1\n420\t1\t1\n421\t1\t1\n422\t1\t1\n423\t1\t1\n424\t1\t1\n425\t1\t1\n426\t1\t1\n427\t1\t1\n428\t1\t1\n429\t1\t1\n430\t1\t1\n431\t1\t1\n432\t1\t1\n433\t1\t1\n434\t1\t1\n435\t1\t1\n436\t1\t1\n437\t1\t1\n438\t1\t1\n439\t1\t1\n440\t1\t1\n441\t1\t1\n442\t1\t1\n443\t1\t1\n444\t1\t1\n445\t1\t1\n446\t1\t1\n447\t1\t1\n448\t1\t1\n449\t1\t1\n450\t1\t1\n451\t1\t1\n452\t1\t1\n453\t1\t1\n454\t1\t1\n455\t1\t1\n456\t1\t1\n457\t1\t1\n458\t1\t1\n459\t1\t1\n460\t1\t1\n461\t1\t1\n462\t1\t1\n463\t1\t1\n464\t1\t1\n465\t1\t1\n466\t1\t1\n467\t1\t1\n468\t1\t1\n469\t1\t1\n470\t1\t1\n471\t1\t1\n472\t1\t1\n473\t1\t1\n474\t1\t1\n475\t1\t1\n476\t1\t1\n477\t1\t1\n478\t1\t1\n479\t1\t1\n480\t1\t1\n481\t1\t1\n482\t1\t1\n483\t1\t1\n484\t1\t1\n485\t1\t1\n486\t1\t1\n487\t1\t1\n488\t1\t1\n489\t1\t1\n490\t1\t1\n491\t1\t1\n492\t1\t1\n493\t1\t1\n494\t1\t1\n495\t1\t1\n496\t1\t1\n497\t1\t1\n498\t1\t1\n499\t1\t1\n500\t1\t1\n501\t1\t1\n502\t1\t1\n503\t1\t1\n504\t1\t1\n505\t1\t1\n506\t1\t1\n507\t1\t1\n508\t1\t1\n509\t1\t1\n510\t1\t1\n511\t1\t1\n512\t1\t1\n513\t1\t1\n514\t1\t1\n515\t1\t1\n516\t1\t1\n517\t1\t1\n518\t1\t1\n519\t1\t1\n520\t1\t1\n521\t1\t1\n522\t1\t1\n523\t1\t1\n524\t1\t1\n525\t1\t1\n526\t1\t1\n527\t1\t1\n528\t1\t1\n529\t1\t1\n530\t1\t1\n531\t1\t1\n532\t1\t1\n533\t1\t1\n534\t1\t1\n535\t1\t1\n536\t1\t1\n537\t1\t1\n538\t1\t1\n539\t1\t1\n540\t1\t1\n541\t1\t1\n542\t1\t1\n543\t1\t1\n544\t1\t1\n545\t1\t1\n546\t1\t1\n547\t1\t1\n548\t1\t1\n549\t1\t1\n550\t1\t1\n551\t1\t1\n552\t1\t1\n553\t1\t1\n554\t1\t1\n555\t1\t1\n556\t1\t1\n557\t1\t1\n558\t1\t1\n559\t1\t1\n560\t1\t1\n561\t1\t1\n562\t1\t1\n563\t1\t1\n564\t1\t1\n565\t1\t1\n566\t1\t1\n567\t1\t1\n568\t1\t1\n569\t1\t1\n570\t1\t1\n571\t1\t1\n572\t1\t1\n573\t1\t1\n574\t1\t1\n575\t1\t1\n576\t1\t1\n577\t1\t1\n578\t1\t1\n579\t1\t1\n580\t1\t1\n581\t1\t1\n582\t1\t1\n583\t1\t1\n584\t1\t1\n585\t1\t1\n586\t1\t1\n587\t1\t1\n588\t1\t1\n589\t1\t1\n590\t1\t1\n591\t1\t1\n592\t1\t1\n593\t1\t1\n594\t1\t1\n595\t1\t1\n596\t1\t1\n597\t1\t1\n598\t1\t1\n599\t1\t1\n600\t1\t1\n",
+    "checksum-negative.stdout": "1\t1\t1\n2\t1\t1\n3\t1\t1\n4\t1\t1\n5\t1\t1\n6\t1\t1\n7\t1\t1\n8\t1\t1\n9\t1\t1\n10\t1\t1\n11\t1\t1\n12\t1\t1\n13\t1\t1\n14\t1\t1\n15\t1\t1\n16\t1\t1\n17\t1\t1\n18\t1\t1\n19\t1\t1\n20\t1\t1\n21\t1\t1\n22\t1\t1\n23\t1\t1\n24\t1\t1\n25\t1\t1\n26\t1\t1\n27\t1\t1\n28\t1\t1\n29\t1\t1\n30\t1\t1\n31\t1\t1\n32\t1\t1\n33\t1\t1\n34\t1\t1\n35\t1\t1\n36\t1\t1\n37\t1\t1\n38\t1\t1\n39\t1\t1\n40\t1\t1\n41\t1\t1\n42\t1\t1\n43\t1\t1\n44\t1\t1\n45\t1\t1\n46\t1\t1\n47\t1\t1\n48\t1\t1\n49\t1\t1\n50\t1\t1\n51\t1\t1\n52\t1\t1\n53\t1\t1\n54\t1\t1\n55\t1\t1\n56\t1\t1\n57\t1\t1\n58\t1\t1\n59\t1\t1\n60\t1\t1\n61\t1\t1\n62\t1\t1\n63\t1\t1\n64\t1\t1\n",
+    "version-tshark.stderr": "",
+    "checksum-negative.stderr": "",
+    "validate-snort.stdout": "--------------------------------------------------\no\")~   Snort++ 3.13.2.0\n--------------------------------------------------\nLoading $RUN_ROOT/activation-published-20261113-final/snort.lua:\nLoading $RUN_ROOT/prefix/etc/snort/snort.lua:\nLoading snort_defaults.lua:\nFinished snort_defaults.lua:\nFinished $RUN_ROOT/prefix/etc/snort/snort.lua:\n\tssh\n\thost_cache\n\tpop\n\tbinder\n\talert_json\n\tmms\n\tsmtp\n\tips\n\twizard\n\tappid\n\tjs_norm\n\tgtp_inspect\n\tpackets\n\tdce_http_proxy\n\tfile_inspect\n\thttp2_inspect\n\thttp_inspect\n\tftp_data\n\tftp_server\n\tport_scan\n\tstream_icmp\n\tdce_http_server\n\tnormalizer\n\tdce_tcp\n\tiec104\n\tstream_udp\n\tcip\n\ttelnet\n\tssl\n\tsearch_engine\n\tsip\n\trpc_decode\n\tnetflow\n\tdce_smb\n\tstream_user\n\tstream_tcp\n\tstream_ip\n\tprocess\n\tmodbus\n\thost_tracker\n\tback_orifice\n\tclassifications\n\tdnp3\n\topcua\n\tactive\n\tftp_client\n\tdaq\n\tsocks\n\tdecode\n\talerts\n\tstream\n\tnetwork\n\treferences\n\tarp_spoof\n\toutput\n\thosts\n\tdns\n\tdce_udp\n\timap\n\tfile_policy\n\ts7commplus\n\tstream_file\nFinished $RUN_ROOT/activation-published-20261113-final/snort.lua:\nLoading file_inspect.rules_file:\nLoading file_magic.rules:\nFinished file_magic.rules:\nFinished file_inspect.rules_file:\n--------------------------------------------------\nips policies rule stats\n              id  loaded  shared enabled    file\n               1     891       0     891    $RUN_ROOT/activation-published-20261113-final/snort.lua\n--------------------------------------------------\nrule counts\n       total rules loaded: 891\n               text rules: 219\n            builtin rules: 672\n            option chains: 891\n            chain headers: 2\n--------------------------------------------------\nport rule counts\n             tcp     udp    icmp      ip\n     any     672       0       0       0\n   total     672       0       0       0\n--------------------------------------------------\nservice rule counts          to-srv  to-cli\n                  file_id:      219     219\n                    total:      219     219\n--------------------------------------------------\nfast pattern groups\n                to_server: 1\n                to_client: 1\n--------------------------------------------------\nsearch engine (ac_bnfa)\nappid: MaxRss diff: 2820\nappid: patterns loaded: 300\n--------------------------------------------------\npcap DAQ configured to passive.\n\nSnort successfully validated the configuration (with 0 warnings).\no\")~   Snort exiting\n",
+    "version-zeek.stderr": "",
+    "checksum-positive.stderr": "",
+    "validate-snort.stderr": "",
+    "version-zeek.stdout": "$RUN_ROOT/prefix/opt/zeek/bin/zeek version 8.0.11\n",
+    "snort-negative/run.stderr": "",
+    "snort-negative/alert_json.txt": "",
+    "snort-negative/run.stdout": "--------------------------------------------------\no\")~   Snort++ 3.13.2.0\n--------------------------------------------------\nLoading $RUN_ROOT/activation-published-20261113-final/snort.lua:\nLoading $RUN_ROOT/prefix/etc/snort/snort.lua:\nLoading snort_defaults.lua:\nFinished snort_defaults.lua:\nFinished $RUN_ROOT/prefix/etc/snort/snort.lua:\n\tssh\n\thost_cache\n\tpop\n\tbinder\n\talert_json\n\tmms\n\tsmtp\n\tips\n\twizard\n\tappid\n\tjs_norm\n\tgtp_inspect\n\tpackets\n\tdce_http_proxy\n\tfile_inspect\n\thttp2_inspect\n\thttp_inspect\n\tftp_data\n\tftp_server\n\tport_scan\n\tstream_icmp\n\tdce_http_server\n\tnormalizer\n\tdce_tcp\n\tiec104\n\tstream_udp\n\tcip\n\ttelnet\n\tssl\n\tsearch_engine\n\tsip\n\trpc_decode\n\tnetflow\n\tdce_smb\n\tstream_user\n\tstream_tcp\n\tstream_ip\n\tprocess\n\tmodbus\n\thost_tracker\n\tback_orifice\n\tclassifications\n\tdnp3\n\topcua\n\tactive\n\tftp_client\n\tdaq\n\tsocks\n\tdecode\n\talerts\n\tstream\n\tnetwork\n\treferences\n\tarp_spoof\n\toutput\n\thosts\n\tdns\n\tdce_udp\n\timap\n\tfile_policy\n\ts7commplus\n\tstream_file\nFinished $RUN_ROOT/activation-published-20261113-final/snort.lua:\nLoading file_inspect.rules_file:\nLoading file_magic.rules:\nFinished file_magic.rules:\nFinished file_inspect.rules_file:\n--------------------------------------------------\nips policies rule stats\n              id  loaded  shared enabled    file\n               1     891       0     891    $RUN_ROOT/activation-published-20261113-final/snort.lua\n--------------------------------------------------\nrule counts\n       total rules loaded: 891\n               text rules: 219\n            builtin rules: 672\n            option chains: 891\n            chain headers: 2\n--------------------------------------------------\nport rule counts\n             tcp     udp    icmp      ip\n     any     672       0       0       0\n   total     672       0       0       0\n--------------------------------------------------\nservice rule counts          to-srv  to-cli\n                  file_id:      219     219\n                    total:      219     219\n--------------------------------------------------\nfast pattern groups\n                to_server: 1\n                to_client: 1\n--------------------------------------------------\nsearch engine (ac_bnfa)\n                instances: 2\n                 patterns: 438\n            pattern chars: 2602\n               num states: 1832\n         num match states: 392\n             memory scale: KB\n             total memory: 71.2812\n           pattern memory: 19.6484\n        match list memory: 28.4375\n        transition memory: 22.9453\nappid: MaxRss diff: 2880\nappid: patterns loaded: 300\n--------------------------------------------------\npcap DAQ configured to read-file.\nCommencing packet processing\nRetry queue interval is: 200 ms\n++ [0] $RUN_ROOT/activation-published-20261113-final/pcaps/negative.pcap\n-- [0] $RUN_ROOT/activation-published-20261113-final/pcaps/negative.pcap\n--------------------------------------------------\nPacket Statistics\n--------------------------------------------------\ndaq\n                    pcaps: 1\n                 received: 64\n                 analyzed: 64\n                    allow: 64\n                 rx_bytes: 3456\n--------------------------------------------------\ncodec\n                    total: 64          \t(100.000%)\n                      eth: 64          \t(100.000%)\n                     ipv4: 64          \t(100.000%)\n                      tcp: 64          \t(100.000%)\n--------------------------------------------------\nModule Statistics\n--------------------------------------------------\nappid\n                  packets: 64\n        processed_packets: 50\n          ignored_packets: 14\n           total_sessions: 10\n--------------------------------------------------\nbinder\n              raw_packets: 14\n                new_flows: 10\n                 inspects: 24\n--------------------------------------------------\ndetection\n                 analyzed: 64\n--------------------------------------------------\nport_scan\n                  packets: 64\n                 trackers: 4\n--------------------------------------------------\nstream\n                    flows: 10\n             total_prunes: 10\n             flows_closed: 10\n          no_flow_tcp_rst: 2\n         no_flow_unwanted: 12\n    released_max_flow_mem: 2383\n  released_total_flow_mem: 23830\n--------------------------------------------------\nstream_tcp\n                 sessions: 10\n                      max: 10\n                  created: 10\n                 released: 10\n             instantiated: 10\n                   setups: 10\n         syn_ack_trackers: 10\n                 syn_acks: 10\n                     fins: 20\n--------------------------------------------------\nSummary Statistics\n--------------------------------------------------\ntiming\n                  runtime: 00:00:00\n                  seconds: 0.024717\n                 pkts/sec: 2589\n                Mbits/sec: 1\no\")~   Snort exiting\n",
+    "zeek-negative/run.stderr": "1700000002.110000 warning in $RUN_ROOT/prefix/opt/zeek/share/zeek/base/misc/find-filtered-trace.zeek, line 69: The analyzed trace file was determined to contain only TCP control packets, which may indicate it's been pre-filtered.  By default, Zeek reports the missing segments for this type of trace, but the 'detect_filtered_trace' option may be toggled if that's not desired.\n",
+    "zeek-negative/run.stdout": "",
+    "snort-positive/run.stderr": "",
+    "snort-positive/alert_json.txt": "{ \"timestamp\" : \"11/14-22:13:21.400000\", \"seconds\" : 1700000001, \"pkt_num\" : 29, \"proto\" : \"TCP\", \"src_addr\" : \"192.0.2.1\", \"dst_addr\" : \"198.51.100.2\", \"src_port\" : 40014, \"dst_port\" : 1014, \"gid\" : 122, \"sid\" : 1, \"msg\" : \"(port_scan) TCP portscan\" }\n",
+    "snort-positive/run.stdout": "--------------------------------------------------\no\")~   Snort++ 3.13.2.0\n--------------------------------------------------\nLoading $RUN_ROOT/activation-published-20261113-final/snort.lua:\nLoading $RUN_ROOT/prefix/etc/snort/snort.lua:\nLoading snort_defaults.lua:\nFinished snort_defaults.lua:\nFinished $RUN_ROOT/prefix/etc/snort/snort.lua:\n\tssh\n\thost_cache\n\tpop\n\tbinder\n\talert_json\n\tmms\n\tsmtp\n\tips\n\twizard\n\tappid\n\tjs_norm\n\tgtp_inspect\n\tpackets\n\tdce_http_proxy\n\tfile_inspect\n\thttp2_inspect\n\thttp_inspect\n\tftp_data\n\tftp_server\n\tport_scan\n\tstream_icmp\n\tdce_http_server\n\tnormalizer\n\tdce_tcp\n\tiec104\n\tstream_udp\n\tcip\n\ttelnet\n\tssl\n\tsearch_engine\n\tsip\n\trpc_decode\n\tnetflow\n\tdce_smb\n\tstream_user\n\tstream_tcp\n\tstream_ip\n\tprocess\n\tmodbus\n\thost_tracker\n\tback_orifice\n\tclassifications\n\tdnp3\n\topcua\n\tactive\n\tftp_client\n\tdaq\n\tsocks\n\tdecode\n\talerts\n\tstream\n\tnetwork\n\treferences\n\tarp_spoof\n\toutput\n\thosts\n\tdns\n\tdce_udp\n\timap\n\tfile_policy\n\ts7commplus\n\tstream_file\nFinished $RUN_ROOT/activation-published-20261113-final/snort.lua:\nLoading file_inspect.rules_file:\nLoading file_magic.rules:\nFinished file_magic.rules:\nFinished file_inspect.rules_file:\n--------------------------------------------------\nips policies rule stats\n              id  loaded  shared enabled    file\n               1     891       0     891    $RUN_ROOT/activation-published-20261113-final/snort.lua\n--------------------------------------------------\nrule counts\n       total rules loaded: 891\n               text rules: 219\n            builtin rules: 672\n            option chains: 891\n            chain headers: 2\n--------------------------------------------------\nport rule counts\n             tcp     udp    icmp      ip\n     any     672       0       0       0\n   total     672       0       0       0\n--------------------------------------------------\nservice rule counts          to-srv  to-cli\n                  file_id:      219     219\n                    total:      219     219\n--------------------------------------------------\nfast pattern groups\n                to_server: 1\n                to_client: 1\n--------------------------------------------------\nsearch engine (ac_bnfa)\n                instances: 2\n                 patterns: 438\n            pattern chars: 2602\n               num states: 1832\n         num match states: 392\n             memory scale: KB\n             total memory: 71.2812\n           pattern memory: 19.6484\n        match list memory: 28.4375\n        transition memory: 22.9453\nappid: MaxRss diff: 2820\nappid: patterns loaded: 300\n--------------------------------------------------\npcap DAQ configured to read-file.\nCommencing packet processing\nRetry queue interval is: 200 ms\n++ [0] $RUN_ROOT/activation-published-20261113-final/pcaps/positive.pcap\n-- [0] $RUN_ROOT/activation-published-20261113-final/pcaps/positive.pcap\n--------------------------------------------------\nPacket Statistics\n--------------------------------------------------\ndaq\n                    pcaps: 1\n                 received: 600\n                 analyzed: 600\n                    allow: 600\n                 rx_bytes: 32400\n--------------------------------------------------\ncodec\n                    total: 600         \t(100.000%)\n                      eth: 600         \t(100.000%)\n                     ipv4: 600         \t(100.000%)\n                      tcp: 600         \t(100.000%)\n--------------------------------------------------\nModule Statistics\n--------------------------------------------------\nappid\n                  packets: 600\n          ignored_packets: 600\n--------------------------------------------------\nbinder\n              raw_packets: 600\n                 inspects: 600\n--------------------------------------------------\ndetection\n                 analyzed: 600\n                   alerts: 1\n             total_alerts: 1\n                   logged: 1\n--------------------------------------------------\nips_actions\n                    alert: 1\n--------------------------------------------------\nport_scan\n                  packets: 600\n                 trackers: 4\n--------------------------------------------------\nstream\n          no_flow_tcp_rst: 300\n         no_flow_unwanted: 300\n--------------------------------------------------\nSummary Statistics\n--------------------------------------------------\ntiming\n                  runtime: 00:00:00\n                  seconds: 0.025797\n                 pkts/sec: 23259\n                Mbits/sec: 10\no\")~   Snort exiting\n",
+    "zeek-positive/notice.log": "#separator \\x09\n#set_separator\t,\n#empty_field\t(empty)\n#unset_field\t-\n#path\tnotice\n#open\t2026-11-13-03-29-41\n#fields\tts\tuid\tid.orig_h\tid.orig_p\tid.resp_h\tid.resp_p\tfuid\tfile_mime_type\tfile_desc\tproto\tnote\tmsg\tsub\tsrc\tdst\tp\tn\tpeer_descr\tactions\temail_dest\tsuppress_for\tremote_location.country_code\tremote_location.region\tremote_location.city\tremote_location.latitude\tremote_location.longitude\n#types\ttime\tstring\taddr\tport\taddr\tport\tstring\tstring\tstring\tenum\tenum\tstring\tstring\taddr\taddr\tport\tcount\tstring\tset[enum]\tset[string]\tinterval\tstring\tstring\tstring\tdouble\tdouble\n1700000024.910000\t-\t-\t-\t-\t-\t-\t-\t-\t-\tScan::Port_Scan\t192.0.2.1 scanned at least 250 unique ports on host 198.51.100.2 in 0m25s\tlocal\t192.0.2.1\t-\t-\t-\t-\tNotice::ACTION_LOG\t(empty)\t3600.000000\t-\t-\t-\t-\t-\n#close\t2026-11-13-03-29-41\n",
+    "zeek-positive/run.stderr": "1700000029.910000 warning in $RUN_ROOT/prefix/opt/zeek/share/zeek/base/misc/find-filtered-trace.zeek, line 69: The analyzed trace file was determined to contain only TCP control packets, which may indicate it's been pre-filtered.  By default, Zeek reports the missing segments for this type of trace, but the 'detect_filtered_trace' option may be toggled if that's not desired.\n",
+    "zeek-positive/run.stdout": ""
+  },
+  "hermetic_test_log": "test_checksums_pass (test_v2_activation.AuditTests) ... ok\ntest_checksums_reject_partial_or_bad (test_v2_activation.AuditTests) ... ok\ntest_snort_missing_positive_and_bad_json_fail (test_v2_activation.AuditTests) ... ok\ntest_snort_negative_requires_clean_alerts (test_v2_activation.AuditTests) ... ok\ntest_snort_rejects_wrong_count_or_module (test_v2_activation.AuditTests) ... ok\ntest_snort_scopes_packet_counters (test_v2_activation.AuditTests) ... ok\ntest_versions_are_exact (test_v2_activation.AuditTests) ... ok\ntest_zeek_control_checks (test_v2_activation.AuditTests) ... ok\ntest_zeek_header_and_close_required (test_v2_activation.AuditTests) ... ok\ntest_zeek_missing_positive_is_not_success (test_v2_activation.AuditTests) ... ok\ntest_zeek_reads_dynamic_columns (test_v2_activation.AuditTests) ... ok\ntest_deterministic_and_hashes (test_v2_activation.GenerationTests) ... ok\ntest_every_packet_checksum (test_v2_activation.GenerationTests) ... ok\ntest_refuses_overwrite (test_v2_activation.GenerationTests) ... ok\ntest_refuses_symlink_output_file (test_v2_activation.GenerationTests) ... ok\ntest_existing_output_not_touched (test_v2_activation.ProcessTests) ... ok\ntest_failed_provisioning_leaves_manifest (test_v2_activation.ProcessTests) ... ok\ntest_nonzero_exit_logs_preserved (test_v2_activation.ProcessTests) ... ok\ntest_timeout_is_failure (test_v2_activation.ProcessTests) ... ok\ntest_bad_tcp_length (test_workbench.CaptureTests) ... ok\ntest_below_threshold (test_workbench.CaptureTests) ... ok\ntest_byte_limit (test_workbench.CaptureTests) ... ok\ntest_cli_exit_codes (test_workbench.CaptureTests) ... ok\ntest_demo_generator (test_workbench.CaptureTests) ... ok\ntest_demo_refuses_overwrite (test_workbench.CaptureTests) ... ok\ntest_dns_bounds (test_workbench.CaptureTests) ... ok\ntest_flow_sort (test_workbench.CaptureTests) ... ok\ntest_four_magic_variants (test_workbench.CaptureTests) ... ok\ntest_fragment_skipped (test_workbench.CaptureTests) ... ok\ntest_header_rejection (test_workbench.CaptureTests) ... ok\ntest_inclusive_window (test_workbench.CaptureTests) ... ok\ntest_invalid_limits (test_workbench.CaptureTests) ... ok\ntest_invalid_record_metadata (test_workbench.CaptureTests) ... ok\ntest_ipv6_dns_question (test_workbench.CaptureTests) ... ok\ntest_ipv6_extension_header_skipped (test_workbench.CaptureTests) ... ok\ntest_ipv6_fragment_skipped (test_workbench.CaptureTests) ... ok\ntest_ipv6_tcp_scan_and_redaction (test_workbench.CaptureTests) ... ok\ntest_malformed_ipv6 (test_workbench.CaptureTests) ... ok\ntest_packet_limit (test_workbench.CaptureTests) ... ok\ntest_redaction (test_workbench.CaptureTests) ... ok\ntest_repeated_port_not_scan (test_workbench.CaptureTests) ... ok\ntest_short_record_header (test_workbench.CaptureTests) ... ok\ntest_skip_malformed_and_unsupported (test_workbench.CaptureTests) ... ok\ntest_syn_ack_not_scan (test_workbench.CaptureTests) ... ok\ntest_synthetic_demo (test_workbench.CaptureTests) ... ok\ntest_truncated_ipv6_payload (test_workbench.CaptureTests) ... ok\ntest_truncated_record (test_workbench.CaptureTests) ... ok\ntest_vlan (test_workbench.CaptureTests) ... ok\ntest_window_expires (test_workbench.CaptureTests) ... ok\ntest_cli_json_and_generator (test_workbench.PcapngTests) ... ok\ntest_cross_section_scan_alert (test_workbench.PcapngTests) ... ok\ntest_demo_both_orders (test_workbench.PcapngTests) ... ok\ntest_later_section_major_version (test_workbench.PcapngTests) ... ok\ntest_limits (test_workbench.PcapngTests) ... ok\ntest_malformed_later_section (test_workbench.PcapngTests) ... ok\ntest_mismatched_block_length (test_workbench.PcapngTests) ... ok\ntest_multiple_sections_decoded (test_workbench.PcapngTests) ... ok\ntest_non_ethernet_interface (test_workbench.PcapngTests) ... ok\ntest_other_blocks_skipped (test_workbench.PcapngTests) ... ok\ntest_section_interfaces_reset (test_workbench.PcapngTests) ... ok\ntest_section_limit (test_workbench.PcapngTests) ... ok\ntest_section_order_change (test_workbench.PcapngTests) ... ok\ntest_simple_packet_block_skipped (test_workbench.PcapngTests) ... ok\ntest_timestamps_match_classic (test_workbench.PcapngTests) ... ok\ntest_truncated_block (test_workbench.PcapngTests) ... ok\ntest_unsupported_tsresol (test_workbench.PcapngTests) ... ok\n\n----------------------------------------------------------------------\nRan 66 tests in 0.171s\n\nOK\n",
+  "failed_pilot": {
+    "status": "failed",
+    "source": "activation-portable-20261113",
+    "reason": "DAQ and detection both have analyzed counters. The first parser incorrectly treated these as ambiguous; corrected parser scopes to DAQ. Original failed output retained, not scored as zero alerts."
+  }
+}
