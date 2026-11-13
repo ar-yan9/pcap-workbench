@@ -80,7 +80,7 @@ class AuditTests(unittest.TestCase):
     def test_versions_are_exact(self):
         for name,text in [('zeek','zeek version 8.0.11'),('tshark','TShark (Wireshark) 3.6.2'),('snort','Version 3.13.2.0\nUsing DAQ version 3.0.29.0')]:
             runner.require_version(name,text)
-        for name,text in [('zeek','zeek version 8.0.110'),('tshark','TShark (Wireshark) 3.6.20'),('snort','Version 3.13.2.0\nUsing DAQ version 2.0.7.0')]:
+        for name,text in [('zeek','zeek version 8.0.110'),('zeek','zeek version 8.0.11-dev'),('tshark','TShark (Wireshark) 3.6.20'),('snort','Version 3.13.2.0-dev\nUsing DAQ version 3.0.29.0'),('snort','Version 3.13.2.0\nUsing DAQ version 2.0.7.0')]:
             with self.subTest(name=name),self.assertRaises(ValueError):runner.require_version(name,text)
 
     def test_zeek_header_and_close_required(self):
