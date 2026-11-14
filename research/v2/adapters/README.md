@@ -1,6 +1,6 @@
 # Independent evaluator components
 
-Status, 13 November 2026: matching primitive implemented and tested; prediction adapters, compatible-edge construction and full evaluator contract are still pending. Gate A remains OPEN. No accuracy/recall values should be calculated from this module alone.
+Status, 14 November 2026: matching primitive, Zeek/Snort prediction adapters and compatible-edge construction are implemented and tested; evaluator contract v0.1 is drafted in `../evaluator-contract.md`. Gate A remains OPEN pending the frozen generator specification and the benign-alert budget amendment. No accuracy/recall values exist yet.
 
 ## Exact matching primitive
 
@@ -18,17 +18,18 @@ Implementation: unit-capacity min-cost flow with successive shortest augmenting 
 
 `test_v2_matching.py` checks greedy traps, time-distance priority, lexical ties, aggregate/duplicate alerts, disconnected graphs, invalid IDs, float/bool distances and cap failures. It compares against a separate brute-force oracle on all 19,683 three-by-three graphs whose edges are absent or have distance 0/1 ns, plus 250 fixed-seed random graphs up to four-by-four. These are algorithm tests, not experimental samples or detector performance results.
 
-## Required before scoring
+## Prediction adapters and compatible edges, 14 November 2026
 
-The contract and adapters still must freeze:
+`zeek_notice.py` parses notice.log into prediction records using the pinned bro-simple-scan source's five exact message forms, cross-checking note type, direction, scanner and port formats; unknown scan content raises. `snort_alert.py` parses alert_json with the gid 122 sid table frozen from the pinned build's own port_scan module help; sid/message/proto contradictions raise. Both record engine evidence only: no technique is invented (family stays generic-scan), sweep groups stay unknown-group, and Zeek notice ts is an emission timestamp, never a decision time.
 
-- Exact vs generic vertical/horizontal family compatibility, with unsupported/generic classes kept explicit.
-- How aggregate notices recover target/group evidence from raw engine logs without borrowing target identities from ground truth.
-- Identity normalization, event time, emission/decision time and delayed/EOF attribution rules.
-- Benign and ambiguous intervals, finite control units, duplicate accounting and all-scope/common-scope denominators.
-- Development-only operating-point selection and generator parameter ranges before any held-out inspection.
+`compatibility.py` builds candidate edges under the contract gates (capture, scanner, direction, target/group), classifies timing as within/delayed/early, rejects early alerts, flags random-aggregate edges, and preserves every candidate, near-miss reject and per-alert gate-failure count for audit. `test_v2_adapters.py` covers real published activation outputs, all documented message shapes, strictness failures, gate behavior, delayed/duplicate matching against the exact matcher, and intent/group-evidence recording. These are format and contract tests, not detector performance results.
 
-Do not turn a missing baseline packet-ID field into automatic failure, or use detector-produced labels as independent truth. Do not call an unmatched alert a false positive until compatibility and ambiguity rules are fixed. Save every candidate edge and unmatched/ambiguous reason so later evaluation can be audited.
+## Still required before scoring
+
+- Frozen synthetic generator parameter ranges and distributions (protocol corpus section); no held-out generation before it exists.
+- The benign-alert budget amendment and the development-only operating-point selection on seeds 0..9.
+
+Do not turn a missing baseline packet-ID field into automatic failure, or use detector-produced labels as independent truth. Do not call an unmatched alert a false positive until it has passed the contract's suppression, duplicate and ambiguity classifications. Save every candidate edge and unmatched/ambiguous reason so later evaluation can be audited.
 
 ## Timing diagnostic to resolve in the contract
 
