@@ -1,0 +1,265 @@
+{
+  "detector": "frozen revision-3 063ad1d (research/v1-rerun/evaluated_workbench.py)",
+  "epoch_edge_pair": {
+    "w_edge_exclusive_no_alert": {
+      "actual_alerts": 0,
+      "base_seconds": 1800000000,
+      "expected_alerts": 0,
+      "verdict": "PASS"
+    },
+    "w_edge_inclusive_alert": {
+      "actual_alerts": 1,
+      "base_seconds": 1800000000,
+      "expected_alerts": 1,
+      "verdict": "PASS"
+    }
+  },
+  "note": "eviction arithmetic in evaluated_workbench.py is integer nanoseconds; the epoch pair verifies behavior, not assumptions. First 100k build had a fixture defect (scanner 489 shared 203.0.113.20 with CLIENT; strict matching correctly rejected its evidence at W=300); builder fixed to host 21+(i%20), rebuilt, and this file reports the corrected runs.",
+  "probe": "C3 scale-up: RSS, 102,600-record workload, epoch-scale window edge",
+  "scan_heavy_100k_artifact": {
+    "note": "the 7,186,114-byte pcap is published xz-compressed because the GitHub web rename path does not preserve content for binaries above ~1MB; python3 c3_scale.py (build_100k) regenerates the identical bytes deterministically (verified: rebuilt hash equals the hash recorded here)",
+    "pcap": "data/c3-workloads/scan_heavy_100k.pcap.xz (xz -9e compressed; decompress to scan_heavy_100k.pcap)",
+    "pcap_git_blob_sha1": "e4f920d8bb42f5ff2a8d35275f795e5d7a20b071",
+    "pcap_sha256": "bb156afef48b9bf59fd33c96e60455c33e1fe1f3b71ef01047e055346a4be911"
+  },
+  "workloads": {
+    "scan_heavy_100k": {
+      "evaluator_grid": [
+        {
+          "alerts": 500,
+          "ports": 10,
+          "precision": 1.0,
+          "recall": 1.0,
+          "unmatched_alerts": 0,
+          "window": 10
+        },
+        {
+          "alerts": 500,
+          "ports": 10,
+          "precision": 1.0,
+          "recall": 1.0,
+          "unmatched_alerts": 0,
+          "window": 60
+        },
+        {
+          "alerts": 500,
+          "ports": 10,
+          "precision": 1.0,
+          "recall": 1.0,
+          "unmatched_alerts": 0,
+          "window": 300
+        },
+        {
+          "alerts": 500,
+          "ports": 5,
+          "precision": 1.0,
+          "recall": 1.0,
+          "unmatched_alerts": 0,
+          "window": 60
+        },
+        {
+          "alerts": 500,
+          "ports": 15,
+          "precision": 1.0,
+          "recall": 1.0,
+          "unmatched_alerts": 0,
+          "window": 60
+        },
+        {
+          "alerts": 500,
+          "ports": 20,
+          "precision": 1.0,
+          "recall": 1.0,
+          "unmatched_alerts": 0,
+          "window": 60
+        },
+        {
+          "alerts": 500,
+          "ports": 5,
+          "precision": 1.0,
+          "recall": 1.0,
+          "unmatched_alerts": 0,
+          "window": 300
+        },
+        {
+          "alerts": 500,
+          "ports": 20,
+          "precision": 1.0,
+          "recall": 1.0,
+          "unmatched_alerts": 0,
+          "window": 300
+        }
+      ],
+      "grid": [
+        {
+          "alerts": 500,
+          "peak_rss_max_mib": 167.5,
+          "peak_rss_median_mib": 167.4,
+          "ports": 10,
+          "wall_max_s": 0.877,
+          "wall_median_s": 0.856,
+          "wall_min_s": 0.842,
+          "window": 10
+        },
+        {
+          "alerts": 500,
+          "peak_rss_max_mib": 167.9,
+          "peak_rss_median_mib": 167.9,
+          "ports": 10,
+          "wall_max_s": 1.644,
+          "wall_median_s": 1.618,
+          "wall_min_s": 1.528,
+          "window": 60
+        },
+        {
+          "alerts": 500,
+          "peak_rss_max_mib": 168.3,
+          "peak_rss_median_mib": 168.2,
+          "ports": 10,
+          "wall_max_s": 1.923,
+          "wall_median_s": 1.87,
+          "wall_min_s": 1.791,
+          "window": 300
+        },
+        {
+          "alerts": 500,
+          "peak_rss_max_mib": 168.0,
+          "peak_rss_median_mib": 167.9,
+          "ports": 5,
+          "wall_max_s": 1.616,
+          "wall_median_s": 1.553,
+          "wall_min_s": 1.511,
+          "window": 60
+        },
+        {
+          "alerts": 500,
+          "peak_rss_max_mib": 167.9,
+          "peak_rss_median_mib": 167.8,
+          "ports": 15,
+          "wall_max_s": 1.605,
+          "wall_median_s": 1.551,
+          "wall_min_s": 1.519,
+          "window": 60
+        },
+        {
+          "alerts": 500,
+          "peak_rss_max_mib": 168.0,
+          "peak_rss_median_mib": 168.0,
+          "ports": 20,
+          "wall_max_s": 1.619,
+          "wall_median_s": 1.574,
+          "wall_min_s": 1.544,
+          "window": 60
+        },
+        {
+          "alerts": 500,
+          "peak_rss_max_mib": 168.3,
+          "peak_rss_median_mib": 168.2,
+          "ports": 5,
+          "wall_max_s": 1.944,
+          "wall_median_s": 1.859,
+          "wall_min_s": 1.719,
+          "window": 300
+        },
+        {
+          "alerts": 500,
+          "peak_rss_max_mib": 168.3,
+          "peak_rss_median_mib": 168.2,
+          "ports": 20,
+          "wall_max_s": 1.937,
+          "wall_median_s": 1.802,
+          "wall_min_s": 1.769,
+          "window": 300
+        }
+      ],
+      "max_packets": 200000,
+      "records": 102600
+    },
+    "scan_heavy_10k": {
+      "grid": [
+        {
+          "alerts": 40,
+          "peak_rss_max_mib": 29.8,
+          "peak_rss_median_mib": 29.7,
+          "ports": 10,
+          "wall_max_s": 0.075,
+          "wall_median_s": 0.074,
+          "wall_min_s": 0.072,
+          "window": 10
+        },
+        {
+          "alerts": 40,
+          "peak_rss_max_mib": 29.9,
+          "peak_rss_median_mib": 29.8,
+          "ports": 10,
+          "wall_max_s": 0.125,
+          "wall_median_s": 0.116,
+          "wall_min_s": 0.113,
+          "window": 60
+        },
+        {
+          "alerts": 40,
+          "peak_rss_max_mib": 29.9,
+          "peak_rss_median_mib": 29.8,
+          "ports": 10,
+          "wall_max_s": 0.158,
+          "wall_median_s": 0.149,
+          "wall_min_s": 0.144,
+          "window": 300
+        },
+        {
+          "alerts": 40,
+          "peak_rss_max_mib": 29.9,
+          "peak_rss_median_mib": 29.8,
+          "ports": 5,
+          "wall_max_s": 0.124,
+          "wall_median_s": 0.122,
+          "wall_min_s": 0.12,
+          "window": 60
+        },
+        {
+          "alerts": 40,
+          "peak_rss_max_mib": 29.9,
+          "peak_rss_median_mib": 29.8,
+          "ports": 15,
+          "wall_max_s": 0.125,
+          "wall_median_s": 0.12,
+          "wall_min_s": 0.108,
+          "window": 60
+        },
+        {
+          "alerts": 40,
+          "peak_rss_max_mib": 29.9,
+          "peak_rss_median_mib": 29.8,
+          "ports": 20,
+          "wall_max_s": 0.121,
+          "wall_median_s": 0.112,
+          "wall_min_s": 0.108,
+          "window": 60
+        },
+        {
+          "alerts": 40,
+          "peak_rss_max_mib": 29.8,
+          "peak_rss_median_mib": 29.8,
+          "ports": 5,
+          "wall_max_s": 0.159,
+          "wall_median_s": 0.151,
+          "wall_min_s": 0.145,
+          "window": 300
+        },
+        {
+          "alerts": 40,
+          "peak_rss_max_mib": 29.9,
+          "peak_rss_median_mib": 29.8,
+          "ports": 20,
+          "wall_max_s": 0.16,
+          "wall_median_s": 0.144,
+          "wall_min_s": 0.138,
+          "window": 300
+        }
+      ],
+      "max_packets": 100000,
+      "records": 10600
+    }
+  }
+}
