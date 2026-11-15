@@ -103,6 +103,41 @@
       "eval.pcap": "552f32464e1d9db15b273cd41f57c51cc3244866c7ef7ed55df5f1940a5010a7"
     },
     "seed-14": {
+  "anchor_seed": 20261027,
+  "bootstrap_draws": 10000,
+  "evaluator_sha256": "9d6cdae2f5db87fce70a550a7ba393c109084564064e824bca16d93fb9de562f",
+  "fixtures": {
+    "seed-0": {
+      "eval.labels": "17cf06e77aca732b052b6275f2bb2e2ba78d6c84130ac149f75e675fca4e5889",
+      "eval.labels.events.json": "5eab7e151a5ea6d9f1460a4ea881d1b5ee51011941a97a5a6082afe907d66238",
+      "eval.pcap": "3ee221087f6b2f47f2c6f40e9806e9ff702cd9d59690b643c4c1f9d1fbf2d8b9"
+    },
+    "seed-1": {
+      "eval.labels": "17cf06e77aca732b052b6275f2bb2e2ba78d6c84130ac149f75e675fca4e5889",
+      "eval.labels.events.json": "4d3fd3c67c6927dfc29f9b56d31a969aed18ee86042caa54a7cc62734ef07842",
+      "eval.pcap": "59a1b78e6f9e530497a829153931d8820915efcfc919b247e63481180db1af2b"
+    },
+    "seed-10": {
+      "eval.labels": "17cf06e77aca732b052b6275f2bb2e2ba78d6c84130ac149f75e675fca4e5889",
+      "eval.labels.events.json": "57b00e67aad674b196480fbcb04ffbb500215cd08eb6e116255f215d00338326",
+      "eval.pcap": "e790922cea2f428bd19da6f5f4f4d9956c33a3454fb65c5cbc049481474baa7c"
+    },
+    "seed-11": {
+      "eval.labels": "17cf06e77aca732b052b6275f2bb2e2ba78d6c84130ac149f75e675fca4e5889",
+      "eval.labels.events.json": "21e917a83984e88382749f0af900bd8f6139d33e8a3adcc6420c7ce359d94a8c",
+      "eval.pcap": "575b922b0e8739891478cddf4eda3cae2be0aaa5920833da51bc15a8caf66717"
+    },
+    "seed-12": {
+      "eval.labels": "17cf06e77aca732b052b6275f2bb2e2ba78d6c84130ac149f75e675fca4e5889",
+      "eval.labels.events.json": "271235b190d50475ca59bc888850f0f4ee8dbb4ef4a6f5bbc86294d7b17b4cc1",
+      "eval.pcap": "b8ef43e48f96449717e0325bbe88f116c408efe54203f3c0e0ac7baa19ee2280"
+    },
+    "seed-13": {
+      "eval.labels": "17cf06e77aca732b052b6275f2bb2e2ba78d6c84130ac149f75e675fca4e5889",
+      "eval.labels.events.json": "46ad3724eac1c64d86fa0da04173017b5ae44b226e481d699625cec9585bfb39",
+      "eval.pcap": "552f32464e1d9db15b273cd41f57c51cc3244866c7ef7ed55df5f1940a5010a7"
+    },
+    "seed-14": {
       "eval.labels": "17cf06e77aca732b052b6275f2bb2e2ba78d6c84130ac149f75e675fca4e5889",
       "eval.labels.events.json": "a24b3dc29e0d31788d2c69df78c22f605850c3dc7c794cf3b7e92b53f0a611e9",
       "eval.pcap": "d60165919107ec431ae066f67ceaf6306ea297c407eebbcfb15d5737c3a1e55c"
@@ -297,4 +332,4 @@
       20
     ]
   ]
-  }
+    }
