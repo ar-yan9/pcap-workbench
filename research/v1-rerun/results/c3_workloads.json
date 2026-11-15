@@ -1,0 +1,112 @@
+{
+  "ack_only_passed": 3,
+  "ack_only_replication": [
+    {
+      "actual_alerts": 0,
+      "expected_alerts": 0,
+      "note": "SYN+ACK set on every probe: rule requires syn and not ack",
+      "records": 50,
+      "unit": "ack_syn_scan_shape",
+      "verdict": "PASS"
+    },
+    {
+      "actual_alerts": 0,
+      "expected_alerts": 0,
+      "note": "pure ACK probes: never enter the SYN queue",
+      "records": 50,
+      "unit": "ack_only_scan_shape",
+      "verdict": "PASS"
+    },
+    {
+      "actual_alerts": 1,
+      "expected_alerts": 1,
+      "note": "plain SYN control: identical shape must alert once",
+      "records": 50,
+      "unit": "syn_control_scan_shape",
+      "verdict": "PASS"
+    }
+  ],
+  "detector": "frozen revision-3 063ad1d (research/v1-rerun/evaluated_workbench.py)",
+  "evaluator": "frozen 8-setting grid (research/v1-rerun/evaluate.py match())",
+  "probe": "C3 ACK-only replication + scan-heavy workload",
+  "scan_heavy_workload": {
+    "attack_units": 40,
+    "benign_units": 1,
+    "grid": [
+      {
+        "alerts": 40,
+        "ports": 10,
+        "precision": 1.0,
+        "recall": 1.0,
+        "unmatched_alerts": 0,
+        "wall_seconds": 0.217,
+        "window": 10
+      },
+      {
+        "alerts": 40,
+        "ports": 10,
+        "precision": 1.0,
+        "recall": 1.0,
+        "unmatched_alerts": 0,
+        "wall_seconds": 0.143,
+        "window": 60
+      },
+      {
+        "alerts": 40,
+        "ports": 10,
+        "precision": 1.0,
+        "recall": 1.0,
+        "unmatched_alerts": 0,
+        "wall_seconds": 0.143,
+        "window": 300
+      },
+      {
+        "alerts": 40,
+        "ports": 5,
+        "precision": 1.0,
+        "recall": 1.0,
+        "unmatched_alerts": 0,
+        "wall_seconds": 0.111,
+        "window": 60
+      },
+      {
+        "alerts": 40,
+        "ports": 15,
+        "precision": 1.0,
+        "recall": 1.0,
+        "unmatched_alerts": 0,
+        "wall_seconds": 0.108,
+        "window": 60
+      },
+      {
+        "alerts": 40,
+        "ports": 20,
+        "precision": 1.0,
+        "recall": 1.0,
+        "unmatched_alerts": 0,
+        "wall_seconds": 0.104,
+        "window": 60
+      },
+      {
+        "alerts": 40,
+        "ports": 5,
+        "precision": 1.0,
+        "recall": 1.0,
+        "unmatched_alerts": 0,
+        "wall_seconds": 0.143,
+        "window": 300
+      },
+      {
+        "alerts": 40,
+        "ports": 20,
+        "precision": 1.0,
+        "recall": 1.0,
+        "unmatched_alerts": 0,
+        "wall_seconds": 0.141,
+        "window": 300
+      }
+    ],
+    "pcap_bytes": 746114,
+    "records": 10600
+  }
+}
