@@ -1,0 +1,161 @@
+{
+  "detector": "frozen revision-3 063ad1d (research/v1-rerun/evaluated_workbench.py)",
+  "failed": 0,
+  "passed": 10,
+  "probe": "C2 boundary units (T-1/T/T+1 threshold edge, W/W+1us window edge, slide, distinctness, per-pair, emitted-once)",
+  "results": [
+    {
+      "actual_alerts": 0,
+      "actual_distinct": null,
+      "detected_at": [],
+      "expected_alerts": 0,
+      "expected_distinct": null,
+      "note": "9 distinct ports in 9 s < threshold 10",
+      "ports": 10,
+      "records": 9,
+      "skipped": {},
+      "unit": "t_minus1_no_alert",
+      "verdict": "PASS",
+      "window": 60
+    },
+    {
+      "actual_alerts": 1,
+      "actual_distinct": 10,
+      "detected_at": [
+        "2026-03-23T21:06:50+00:00"
+      ],
+      "expected_alerts": 1,
+      "expected_distinct": 10,
+      "note": "10 distinct ports in 10 s == threshold 10",
+      "ports": 10,
+      "records": 10,
+      "skipped": {},
+      "unit": "t_exact_alert",
+      "verdict": "PASS",
+      "window": 60
+    },
+    {
+      "actual_alerts": 1,
+      "actual_distinct": 10,
+      "detected_at": [
+        "2026-03-23T21:06:50+00:00"
+      ],
+      "expected_alerts": 1,
+      "expected_distinct": 10,
+      "note": "11 distinct ports; alert at the 10th; emitted-once semantics",
+      "ports": 10,
+      "records": 11,
+      "skipped": {},
+      "unit": "t_plus1_single_alert",
+      "verdict": "PASS",
+      "window": 60
+    },
+    {
+      "actual_alerts": 1,
+      "actual_distinct": 10,
+      "detected_at": [
+        "2026-03-23T21:07:40+00:00"
+      ],
+      "expected_alerts": 1,
+      "expected_distinct": 10,
+      "note": "span exactly window=60 s: now-oldest == W is NOT evicted (rule is > W)",
+      "ports": 10,
+      "records": 10,
+      "skipped": {},
+      "unit": "w_edge_inclusive_alert",
+      "verdict": "PASS",
+      "window": 60
+    },
+    {
+      "actual_alerts": 0,
+      "actual_distinct": null,
+      "detected_at": [],
+      "expected_alerts": 0,
+      "expected_distinct": null,
+      "note": "span 60 s + 1 us: now-oldest > W evicts the oldest -> 9 distinct",
+      "ports": 10,
+      "records": 10,
+      "skipped": {},
+      "unit": "w_edge_exclusive_no_alert",
+      "verdict": "PASS",
+      "window": 60
+    },
+    {
+      "actual_alerts": 1,
+      "actual_distinct": 10,
+      "detected_at": [
+        "2026-03-23T21:07:40.500000+00:00"
+      ],
+      "expected_alerts": 1,
+      "expected_distinct": 10,
+      "note": "oldest 59.5 s old at decision time -> still inside window",
+      "ports": 10,
+      "records": 10,
+      "skipped": {},
+      "unit": "w_slide_stay_alert",
+      "verdict": "PASS",
+      "window": 60
+    },
+    {
+      "actual_alerts": 0,
+      "actual_distinct": null,
+      "detected_at": [],
+      "expected_alerts": 0,
+      "expected_distinct": null,
+      "note": "oldest 60.5 s old at decision time -> evicted -> 9 distinct",
+      "ports": 10,
+      "records": 10,
+      "skipped": {},
+      "unit": "w_slide_evict_no_alert",
+      "verdict": "PASS",
+      "window": 60
+    },
+    {
+      "actual_alerts": 0,
+      "actual_distinct": null,
+      "detected_at": [],
+      "expected_alerts": 0,
+      "expected_distinct": null,
+      "note": "25 SYNs to one port in 25 s: distinct ports = 1",
+      "ports": 10,
+      "records": 25,
+      "skipped": {},
+      "unit": "same_port_repeat_no_alert",
+      "verdict": "PASS",
+      "window": 60
+    },
+    {
+      "actual_alerts": 1,
+      "actual_distinct": 10,
+      "detected_at": [
+        "2026-03-23T21:06:50+00:00"
+      ],
+      "expected_alerts": 1,
+      "expected_distinct": 10,
+      "note": "(src,dst) queues are independent; 9-port pair stays silent",
+      "ports": 10,
+      "records": 19,
+      "skipped": {},
+      "unit": "per_pair_isolation",
+      "verdict": "PASS",
+      "window": 60
+    },
+    {
+      "actual_alerts": 1,
+      "actual_distinct": 10,
+      "detected_at": [
+        "2026-03-23T21:06:50+00:00"
+      ],
+      "expected_alerts": 1,
+      "expected_distinct": 10,
+      "note": "two full sweeps in one window; alert emitted once per pair",
+      "ports": 10,
+      "records": 20,
+      "skipped": {},
+      "unit": "emitted_once_no_realert",
+      "verdict": "PASS",
+      "window": 60
+    }
+  ],
+  "units": 10
+}
