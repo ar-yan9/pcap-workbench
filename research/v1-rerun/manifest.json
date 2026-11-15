@@ -1,0 +1,231 @@
+{
+  "anchor_seed": 20261027,
+  "bootstrap_draws": 10000,
+  "evaluator_sha256": "9d6cdae2f5db87fce70a550a7ba393c109084564064e824bca16d93fb9de562f",
+  "fixtures": {
+    "seed-0": {
+      "eval.labels": "17cf06e77aca732b052b6275f2bb2e2ba78d6c84130ac149f75e675fca4e5889",
+      "eval.labels.events.json": "5eab7e151a5ea6d9f1460a4ea881d1b5ee51011941a97a5a6082afe907d66238",
+      "eval.pcap": "3ee221087f6b2f47f2c6f40e9806e9ff702cd9d59690b643c4c1f9d1fbf2d8b9"
+    },
+    "seed-1": {
+      "eval.labels": "17cf06e77aca732b052b6275f2bb2e2ba78d6c84130ac149f75e675fca4e5889",
+      "eval.labels.events.json": "4d3fd3c67c6927dfc29f9b56d31a969aed18ee86042caa54a7cc62734ef07842",
+      "eval.pcap": "59a1b78e6f9e530497a829153931d8820915efcfc919b247e63481180db1af2b"
+    },
+    "seed-10": {
+      "eval.labels": "17cf06e77aca732b052b6275f2bb2e2ba78d6c84130ac149f75e675fca4e5889",
+      "eval.labels.events.json": "57b00e67aad674b196480fbcb04ffbb500215cd08eb6e116255f215d00338326",
+      "eval.pcap": "e790922cea2f428bd19da6f5f4f4d9956c33a3454fb65c5cbc049481474baa7c"
+    },
+    "seed-11": {
+      "eval.labels": "17cf06e77aca732b052b6275f2bb2e2ba78d6c84130ac149f75e675fca4e5889",
+      "eval.labels.events.json": "21e917a83984e88382749f0af900bd8f6139d33e8a3adcc6420c7ce359d94a8c",
+      "eval.pcap": "575b922b0e8739891478cddf4eda3cae2be0aaa5920833da51bc15a8caf66717"
+    },
+    "seed-12": {
+      "eval.labels": "17cf06e77aca732b052b6275f2bb2e2ba78d6c84130ac149f75e675fca4e5889",
+      "eval.labels.events.json": "271235b190d50475ca59bc888850f0f4ee8dbb4ef4a6f5bbc86294d7b17b4cc1",
+      "eval.pcap": "b8ef43e48f96449717e0325bbe88f116c408efe54203f3c0e0ac7baa19ee2280"
+    },
+    "seed-13": {
+      "eval.labels": "17cf06e77aca732b052b6275f2bb2e2ba78d6c84130ac149f75e675fca4e5889",
+      "eval.labels.events.json": "46ad3724eac1c64d86fa0da04173017b5ae44b226e481d699625cec9585bfb39",
+      "eval.pcap": "552f32464e1d9db15b273cd41f57c51cc3244866c7ef7ed55df5f1940a5010a7"
+    },
+    "seed-14": {
+      "eval.labels": "17cf06e77aca732b052b6275f2bb2e2ba78d6c84130ac149f75e675fca4e5889",
+      "eval.labels.events.json": "a24b3dc29e0d31788d2c69df78c22f605850c3dc7c794cf3b7e92b53f0a611e9",
+      "eval.pcap": "d60165919107ec431ae066f67ceaf6306ea297c407eebbcfb15d5737c3a1e55c"
+    },
+    "seed-15": {
+      "eval.labels": "17cf06e77aca732b052b6275f2bb2e2ba78d6c84130ac149f75e675fca4e5889",
+      "eval.labels.events.json": "095f104a65e16166a9ef9c91aba4b0d9522447d3862ee1f6d55022e482a5290c",
+      "eval.pcap": "4cab8ed05e393595e08e133c49da177bc99675015a00b838f257c5016742c529"
+    },
+    "seed-16": {
+      "eval.labels": "17cf06e77aca732b052b6275f2bb2e2ba78d6c84130ac149f75e675fca4e5889",
+      "eval.labels.events.json": "d50bb992a5c1875a14a02588f0a9ad255b65970e3cfe7506483d64a79e1fa912",
+      "eval.pcap": "cb860bb164112cad256c84c223df161afaa7223ecb906818b82429c5f6775fa7"
+    },
+    "seed-17": {
+      "eval.labels": "17cf06e77aca732b052b6275f2bb2e2ba78d6c84130ac149f75e675fca4e5889",
+      "eval.labels.events.json": "f964dc43fe72b47d80f43fb5da26e84a02521b6ecb0b67575f13cccb5e762a24",
+      "eval.pcap": "e34a2850661d87e5acd77f02763c5516abcb1d372d1c06caefbf18d6aa89ca7b"
+    },
+    "seed-18": {
+      "eval.labels": "17cf06e77aca732b052b6275f2bb2e2ba78d6c84130ac149f75e675fca4e5889",
+      "eval.labels.events.json": "1aa4158f381ac6bf9d5e559afc19ec9fea4a3f99afd0b5fb0590dfa9b985a91a",
+      "eval.pcap": "724678babb92034c0b7ac503c40777d1984710263553093463d9e2935a543d04"
+    },
+    "seed-19": {
+      "eval.labels": "17cf06e77aca732b052b6275f2bb2e2ba78d6c84130ac149f75e675fca4e5889",
+      "eval.labels.events.json": "26dc05c0d9c727369df78c6bcbc136d6106eddea99583cd3557d0fe840d7d353",
+      "eval.pcap": "0d13bc968785794a5299c0da0c8ddfcf7108849485eb93e1cbdb662ca3a9a091"
+    },
+    "seed-2": {
+      "eval.labels": "17cf06e77aca732b052b6275f2bb2e2ba78d6c84130ac149f75e675fca4e5889",
+      "eval.labels.events.json": "48369ccb961afe2587877f6245e62be5a858350531a870dbc9056a4b79b32d5c",
+      "eval.pcap": "2dc6c5414a56c5a9d254ceab19fab299a43b4b540fd901918ea076898f3733f8"
+    },
+    "seed-20": {
+      "eval.labels": "17cf06e77aca732b052b6275f2bb2e2ba78d6c84130ac149f75e675fca4e5889",
+      "eval.labels.events.json": "a82a4cd7228d4fb35d38b234630748158f85e21460871be776f6451f5850a43a",
+      "eval.pcap": "1b19999c6827a149551ce3eb09f11c21bc949315754da760825a5d8abe0aa163"
+    },
+    "seed-20261027": {
+      "eval.labels": "17cf06e77aca732b052b6275f2bb2e2ba78d6c84130ac149f75e675fca4e5889",
+      "eval.labels.events.json": "1d93d5ba889a2a670cdf171b1bf81f95c8a048dba8a916e378e4e186439b771b",
+      "eval.pcap": "52634bd3653abb22c75da82227da6c15ac2e02fe9a40aa9bb9df4a662f14a302"
+    },
+    "seed-21": {
+      "eval.labels": "17cf06e77aca732b052b6275f2bb2e2ba78d6c84130ac149f75e675fca4e5889",
+      "eval.labels.events.json": "6e4f1d09bf8b667703f44f92944e651a830af4b3f86608b7ba239f2b79143d76",
+      "eval.pcap": "f318956676c8bd070d6912a6beff10376d5fd62facce939906387078db654d74"
+    },
+    "seed-22": {
+      "eval.labels": "17cf06e77aca732b052b6275f2bb2e2ba78d6c84130ac149f75e675fca4e5889",
+      "eval.labels.events.json": "a364b00fd3b514961dc5b4a075acfc30bd8157fcdac5f7aa02f0d5c121f5315a",
+      "eval.pcap": "f923be37ee8d60adc60c4ab16275ce833fed8142fe5925886afd2a7b76ddeeb0"
+    },
+    "seed-23": {
+      "eval.labels": "17cf06e77aca732b052b6275f2bb2e2ba78d6c84130ac149f75e675fca4e5889",
+      "eval.labels.events.json": "47672f55e1382c6b0ca713842575db9c55d37e68766e1b2383621aafbc063720",
+      "eval.pcap": "130d0bd325faaa2d88472ea8b85b04cf197ec4c1d3f1ed853b0f800b9774fe70"
+    },
+    "seed-24": {
+      "eval.labels": "17cf06e77aca732b052b6275f2bb2e2ba78d6c84130ac149f75e675fca4e5889",
+      "eval.labels.events.json": "60d75ca5a8e421397308a6d8f7ec76fffff383ea32e0e9f06f381a432659e2e3",
+      "eval.pcap": "f89fe39827c41d85ab8fc8f28f79cf9e56aea84ed6686d22516812d88260673f"
+    },
+    "seed-25": {
+      "eval.labels": "17cf06e77aca732b052b6275f2bb2e2ba78d6c84130ac149f75e675fca4e5889",
+      "eval.labels.events.json": "2e43fde1a2a9d842e156104e6cc995a726672b29c2667746eed3524e50a46791",
+      "eval.pcap": "87c644ad9fb58d8d23390e6b608d8265afe745ce290b7eaa38f7cecc91a30a4b"
+    },
+    "seed-26": {
+      "eval.labels": "17cf06e77aca732b052b6275f2bb2e2ba78d6c84130ac149f75e675fca4e5889",
+      "eval.labels.events.json": "5a4c8d68bce2d6352a89d85801e868d591d14b7b45d26f8cb1e9e92b3c3d6d72",
+      "eval.pcap": "db440e13d39e5cb9006b6f1e38dd52098a42885f53cd03e1fb50970338cebf59"
+    },
+    "seed-27": {
+      "eval.labels": "17cf06e77aca732b052b6275f2bb2e2ba78d6c84130ac149f75e675fca4e5889",
+      "eval.labels.events.json": "323c72a36027dc33c50a8a9bf73c10458f310e05129e5bae789f6d0ef7fc7848",
+      "eval.pcap": "675d6ac175918b1ad44b67e9beac48ad7ad63c8a94fc8334cfddb73ed1c472b1"
+    },
+    "seed-28": {
+      "eval.labels": "17cf06e77aca732b052b6275f2bb2e2ba78d6c84130ac149f75e675fca4e5889",
+      "eval.labels.events.json": "396d749c905b76df4a8ed67f5af3ad6d1b858b7478e00ebbd05e4147034ce100",
+      "eval.pcap": "4f01a61ac6e0b390511c5955851535db8557160cd3715d4a19a700c8652a23e2"
+    },
+    "seed-29": {
+      "eval.labels": "17cf06e77aca732b052b6275f2bb2e2ba78d6c84130ac149f75e675fca4e5889",
+      "eval.labels.events.json": "e14e6ee8f53cd547931ee15f9348e2fc47e505a4a31a9fccc567057c2bbb3ec6",
+      "eval.pcap": "b9aac6040c81a1613d89b328bb323d307760208fb3af12818419ccccfc043519"
+    },
+    "seed-3": {
+      "eval.labels": "17cf06e77aca732b052b6275f2bb2e2ba78d6c84130ac149f75e675fca4e5889",
+      "eval.labels.events.json": "54cf3db0b8db6743e40de8928c994d81d8dea3676da674a799ab14db3c68a3c6",
+      "eval.pcap": "2a2763e2963ba9a4801a5650cfe795fa23be2b398b42ad4553bd246e03f562ea"
+    },
+    "seed-4": {
+      "eval.labels": "17cf06e77aca732b052b6275f2bb2e2ba78d6c84130ac149f75e675fca4e5889",
+      "eval.labels.events.json": "d40a245a00ffc3e98a554a50c85dd7b7cae832c4582027fc6e172d6ddf436164",
+      "eval.pcap": "0abdc089c9df26355f439254259b8072cf7832e57c5a12cd8bff6c029754e8b8"
+    },
+    "seed-5": {
+      "eval.labels": "17cf06e77aca732b052b6275f2bb2e2ba78d6c84130ac149f75e675fca4e5889",
+      "eval.labels.events.json": "189df5e6349581216e38fc2881728e1f5ea7c7d124c1bf84b3baf62aa132f8b7",
+      "eval.pcap": "f9a4023f61ed0c33b991f30e6dbffbb322eaaa5894053965454cf8f8b0694c85"
+    },
+    "seed-6": {
+      "eval.labels": "17cf06e77aca732b052b6275f2bb2e2ba78d6c84130ac149f75e675fca4e5889",
+      "eval.labels.events.json": "ef65e07e800e111215908ce5d24ba0c4e83678d03e80d8b0e30ef349e1243cde",
+      "eval.pcap": "4daeb26b5c11390e9a4cd67f8b57ae251ba561a4f3e4feedb469564311bdfea8"
+    },
+    "seed-7": {
+      "eval.labels": "17cf06e77aca732b052b6275f2bb2e2ba78d6c84130ac149f75e675fca4e5889",
+      "eval.labels.events.json": "14eeb300571acb6b35174c2684fb6f1d160ba9ef1e09c34ad87e846ce138674e",
+      "eval.pcap": "ed22e8dd63135a681f86459b2a3c17f37fc772ce5b711053d69c897fb2a89f8b"
+    },
+    "seed-8": {
+      "eval.labels": "17cf06e77aca732b052b6275f2bb2e2ba78d6c84130ac149f75e675fca4e5889",
+      "eval.labels.events.json": "627a380f969bd3ff0dbd12e98052e244e07fe38393387031ebff18124de6ccbd",
+      "eval.pcap": "d5ff7d112fd6b3bf8931cb7e25f65c946e1240626d76d2668c73f4e829f68f5c"
+    },
+    "seed-9": {
+      "eval.labels": "17cf06e77aca732b052b6275f2bb2e2ba78d6c84130ac149f75e675fca4e5889",
+      "eval.labels.events.json": "b26e993d4759fd90d79668f086aa57e6c9916d29f383d460ba53e7da7f78c7fd",
+      "eval.pcap": "bfc6ab82921785ba290afc5844e0869a6c2dae678197b928edbdc368eb9f71fd"
+    }
+  },
+  "generated_at": "2026-11-15T03:34:19.964302+00:00",
+  "generator_sha256": "d503f7bc536461f55b93be0f0e70370866f523cadec3fb086a3008f7b5dc5d4d",
+  "implementation_sha256": "11ea4ca57dfa26ea766f06eaa9f4bb9d914c403610fa38e99667368f392f6c8c",
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29
+  ],
+  "settings": [
+    [
+      10,
+      10
+    ],
+    [
+      60,
+      10
+    ],
+    [
+      300,
+      10
+    ],
+    [
+      60,
+      5
+    ],
+    [
+      60,
+      15
+    ],
+    [
+      60,
+      20
+    ],
+    [
+      300,
+      5
+    ],
+    [
+      300,
+      20
+    ]
+  ]
+}
