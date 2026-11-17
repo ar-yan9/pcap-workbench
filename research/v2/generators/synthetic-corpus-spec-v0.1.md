@@ -136,14 +136,42 @@ no development or held-out evaluation runs had occurred.
    of order 1e-6 per trace, one ordered (source, target) pair to accumulate
    all 5 distinct pool ports inside one window, mimicking a vertical scan at
    T = 5. Generation now caps distinct ports per ordered (source, target) pair
-   at 4 for benign session traffic (`pick_capped_port` in
+   at 4 for benign session traffic (`pick_capped_session` in
    `synthetic_corpus.py`), making the no-alert invariant structural rather
-   than statistical. Marginal host and port distributions are unchanged; the
-   cap binds only when a pair repeats with a fifth distinct port. Attack-trace
-   background already used a 4-port pool and was never affected.
-2. **service-discovery (16), "H = T" phrasing.** The selection detector keys
-   vertically on (source, target) and counts distinct destination ports; it
-   has no horizontal key. The family's no-alert invariant is therefore keyed
-   on the per-(source, host) distinct-port count of 2..4 < T for every grid
-   T >= 5. If a horizontal key is ever added to a future detector, this family
-   becomes an expected-alert control and this erratum must be revisited.
+   than statistical. The cap conditions on per-pair history, so it changes
+   the joint traffic distribution by design; draws for fresh keys remain
+   uniform over the pool, and no distributional equivalence beyond that is
+   claimed. Attack-trace background already used a 4-port pool and was never
+   affected.
+2. **service-discovery (16), "H = T" phrasing.** Written assuming vertical
+   (source, target) aggregation only. The frozen v2 detector contract DOES
+   define horizontal keys (source, target_port, family) with H = T; see
+   Erratum E2 for the resulting reclassification.
+
+
+## Erratum E2, 17 November 2026
+
+Found while reconciling the frozen "Detector contract to implement before
+test runs" (horizontal keys with H = T, flag families) with the benign-alert
+budget, before any v2 detector implementation or scoring run.
+
+1. **Horizontal fan-out of benign session traffic.** normal-sessions (12),
+   nat-shared-source non-shared sessions (15) and attack-trace background all
+   let one (source, port) key accumulate 5+ distinct destinations with small
+   probability (for 15's non-shared sessions, near-certainty at T = 5),
+   mimicking a horizontal scan. Generation now caps distinct destinations per
+   (source, port) at 4 for all benign session traffic, same `pick_capped_session`
+   mechanism and joint-distribution caveat as E1. The no-horizontal-alert
+   invariant for these units is now structural.
+2. **service-discovery (16) reclassified.** Under the frozen horizontal key
+   (source, target_port, family) with H = T, this family's 6..12 hosts per
+   port can cross H at lower T. That is designed benign pressure: family 16
+   is an expected-alert control under horizontal keys (alerts allowed, burden
+   bounded per Amendment A2) and remains zero-tolerance under vertical keys
+   (2..4 distinct ports per (source, host)). Alerting is permitted, not
+   guaranteed, at any given (W, T).
+3. **Expected-alert semantics.** Across A2's expected-alert class, an alert
+   is allowed burden, never a requirement: nat-shared-source's shared-target
+   union (8..40 distinct ports) crosses only T <= the realized union, and
+   approved-admin-scan crosses every grid T. Budget accounting binds burden
+   at settings where alerts occur.
