@@ -125,3 +125,25 @@ units carry intent=benign with the operational-control qualifier.
 - Any parameter change after first generation: dated amendment + version
   bump + new sub-seed prefix; old traces and labels are preserved, never
   regenerated in place.
+
+## Erratum E1, 17 November 2026
+
+Found during pre-results validation of the benign-alert budget (Amendment A2);
+no development or held-out evaluation runs had occurred.
+
+1. **normal-sessions (12) and nat-shared-source non-shared sessions.** The
+   5-service port pools with uniform host-pair draws allowed, with probability
+   of order 1e-6 per trace, one ordered (source, target) pair to accumulate
+   all 5 distinct pool ports inside one window, mimicking a vertical scan at
+   T = 5. Generation now caps distinct ports per ordered (source, target) pair
+   at 4 for benign session traffic (`pick_capped_port` in
+   `synthetic_corpus.py`), making the no-alert invariant structural rather
+   than statistical. Marginal host and port distributions are unchanged; the
+   cap binds only when a pair repeats with a fifth distinct port. Attack-trace
+   background already used a 4-port pool and was never affected.
+2. **service-discovery (16), "H = T" phrasing.** The selection detector keys
+   vertically on (source, target) and counts distinct destination ports; it
+   has no horizontal key. The family's no-alert invariant is therefore keyed
+   on the per-(source, host) distinct-port count of 2..4 < T for every grid
+   T >= 5. If a horizontal key is ever added to a future detector, this family
+   becomes an expected-alert control and this erratum must be revisited.
