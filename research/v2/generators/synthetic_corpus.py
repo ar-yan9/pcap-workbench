@@ -128,34 +128,48 @@ def raw_probe(t, src, dst, sport, dport, flags):
 def jitter(rng):
     return rng.randint(-2_000_000, 2_000_000)
 
-def pick_capped_port(rng, pool, pair_ports, pair, cap=4):
-    """Port draw that keeps distinct ports per ordered (src,dst) pair <= cap.
+def pick_capped_session(rng, hosts, pool, pair_ports, srcport_hosts, src, cap=4):
+    """Draw (dst, port) keeping benign fan-out below every grid threshold.
 
-    Erratum E1 (2026-11-17): with a 5-service pool and uniform pair draws, a
-    repeated pair could accumulate all 5 distinct ports inside one window and
-    mimic a vertical scan (~1e-6 per trace). Capping at 4 makes the benign
-    no-alert invariant structural instead of statistical. Marginal host/port
-    distributions are unchanged; the constraint bites only on repeat pairs.
+    Errata E1/E2 (2026-11-17): uniform draws let repeated (src,dst) pairs
+    accumulate 5 distinct ports (vertical) or repeated (src,port) keys
+    accumulate 5 distinct destinations (horizontal), mimicking a scan at
+    T=5/H=5 with small probability. Capping both distinct sets at 4 makes the
+    benign no-alert invariant structural in both key dimensions. The capping
+    conditions on per-key history, so it changes the joint traffic
+    distribution by design; draws for fresh keys are uniform over the pool,
+    and no distributional equivalence beyond that is claimed.
     """
-    used = pair_ports.setdefault(pair, set())
-    if len(used) < cap:
-        p = rng.choice(pool)
-        used.add(p)
-        return p
-    return rng.choice(sorted(used))
+    for _ in range(100):
+        dst = rng.choice(hosts)
+        port = rng.choice(pool)
+        pp = pair_ports.setdefault((src, dst), set())
+        sh = srcport_hosts.setdefault((src, port), set())
+        if (len(pp) < cap or port in pp) and (len(sh) < cap or dst in sh):
+            pp.add(port)
+            sh.add(dst)
+            return dst, port
+    # Fallback: reuse an already-established (dst, port) for this source;
+    # distinct sets are unchanged, so both caps trivially hold.
+    existing = [(d, p) for (s_, d), ports in pair_ports.items() if s_ == src
+                for p in ports]
+    dst, port = rng.choice(existing)
+    return dst, port
 
 
 def background(rng, base_ns, dur_ns, forbidden):
     """B in 5..20 complete sessions from TEST-NET-3, never touching forbidden addrs."""
     ev = []
-    pair_ports = {}
+    pair_ports, srcport_hosts = {}, {}
+    pool = [80, 443, 22, 8080]
     for _ in range(rng.randint(5, 20)):
         while True:
-            h1, h2 = rng.choice(BG_NET), rng.choice(BG_NET)
-            if h1 != h2 and h1 not in forbidden and h2 not in forbidden:
+            h1 = rng.choice(BG_NET)
+            if h1 not in forbidden:
                 break
+        allowed = [h for h in BG_NET if h != h1 and h not in forbidden]
+        h2, port = pick_capped_session(rng, allowed, pool, pair_ports, srcport_hosts, h1)
         t0 = base_ns + rng.randint(0, max(1, int(dur_ns) - 60_000_000_000))
-        port = pick_capped_port(rng, [80, 443, 22, 8080], pair_ports, (h1, h2))
         ev += session(t0, h1, h2, rng.randint(20000, 60000), port, rng)
     return ev
 
@@ -299,11 +313,12 @@ def build(fam, seed):
         dur_ns = 3600 * 1_000_000_000
         n = rng.randint(40, 120)
         starts = sorted(rng.randint(0, dur_ns - 60_000_000_000) for _ in range(n))
-        pair_ports = {}
+        pair_ports, srcport_hosts = {}, {}
+        pool = [80, 443, 22, 25, 8080]
         for st in starts:
-            h1, h2 = rng.choice(BG_NET), rng.choice(BG_NET)
-            while h1 == h2: h2 = rng.choice(BG_NET)
-            port = pick_capped_port(rng, [80, 443, 22, 25, 8080], pair_ports, (h1, h2))
+            h1 = rng.choice(BG_NET)
+            allowed = [h for h in BG_NET if h != h1]
+            h2, port = pick_capped_session(rng, allowed, pool, pair_ports, srcport_hosts, h1)
             ev += session(base_ns + st, h1, h2, rng.randint(20000, 60000), port, rng)
     elif fam == 'few-port-retries':
         dur_ns = 3600 * 1_000_000_000
@@ -330,12 +345,12 @@ def build(fam, seed):
     elif fam == 'nat-shared-source':
         dur_ns = 3600 * 1_000_000_000
         clients = rng.randint(8, 20)
-        pair_ports = {}
+        pair_ports, srcport_hosts = {}, {}
+        pool = [80, 443, 25, 110, 993]
         for _ in range(clients):
             for _ in range(rng.randint(1, 4)):
-                h = rng.choice(BG_NET)
+                h, port = pick_capped_session(rng, BG_NET, pool, pair_ports, srcport_hosts, NAT_SRC)
                 t0 = base_ns + rng.randint(0, dur_ns - 60_000_000_000)
-                port = pick_capped_port(rng, [80, 443, 25, 110, 993], pair_ports, (NAT_SRC, h))
                 ev += session(t0, NAT_SRC, h, rng.randint(20000, 60000), port, rng)
         shared = rng.randint(4, 8)
         first = last = None
