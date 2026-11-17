@@ -111,3 +111,35 @@ real-world false-positive rates.
    Zeek/Snort baselines are separately labeled and never tuned to it.
    Held-out seeds 10..29 stay untouched until this amendment, the versioned
    selection rule and development results are all frozen.
+
+## Amendment A2.1: detector identity and budget scoping, 17 November 2026
+
+Reconciliation recorded before any development scoring, on reviewer
+qualification of A2. No results existed or exist for v2.
+
+1. **Detector identity.** A2's semantic validation used the historical
+   workbench detector (vertical (source, target) key, distinct destination
+   ports, SYN-without-ACK probes, emit-once per key per trace). That detector
+   is the frozen v1 baseline, not the v2 implementation. The selection
+   detector is the "Detector contract to implement before test runs": keys
+   (source, target, family) and (source, target_port, family) with H = T as a
+   declared convention, SYN/FIN-only/NULL/Xmas family masks, emit-once per
+   active key/family episode with re-arm only after a gap strictly greater
+   than W, distinct-value reference counting and recorded state caps. This
+   detector does not exist yet; implementing it is Gate A work and precedes
+   any operating-point selection. UDP, distributed campaigns and scans slower
+   than the chosen window remain named stress/out-of-scope cases per the
+   scope section. Any future development scores from the historical detector
+   are labeled baseline-v1 and are never presented as v2 detector results.
+2. **Budget scoping by key dimension.** A2's classes apply per key
+   dimension. Zero-tolerance (0 alerts per unit): families 12, 13 and 17
+   under both key dimensions, family 16 under vertical keys only.
+   Expected-alert (alerts allowed in the benign-FP column, burden bounded):
+   14 vertical; 15 vertical at the shared target; 16 horizontal. The
+   segment/burden definitions, selection rule, tie-breaks and
+   no-qualifying-point behavior of A2 are unchanged and bind per dimension.
+3. **Generator alignment.** Spec Errata E1/E2 cap benign fan-out at 4
+   distinct values per key in both dimensions for families 12, 15's
+   non-shared sessions and attack-trace background, making the zero-tolerance
+   invariants structural under the contract's keys. Family 16 keeps its
+   designed 6..12-host pressure.
