@@ -206,6 +206,51 @@ def read_pcap_frames(ev):
     return rows
 
 
+class BenignFanoutInvariantTests(unittest.TestCase):
+    """Erratum E1: benign session traffic never aggregates >= 5 distinct
+    ports on one ordered (src, dst) pair, so the vertical SYN detector cannot
+    alert on it at any grid threshold T >= 5."""
+
+    def max_distinct_ports_per_pair(self, fam):
+        worst = 0
+        for seed in range(6):
+            ev, _ = GEN.build(fam, seed)
+            pair_ports = {}
+            for r in read_pcap_frames(ev):
+                if r[6] == 0x02:  # SYN without ACK
+                    pair_ports.setdefault((r[1], r[2]), set()).add(r[5])
+            # only benign sources: exclude declared attack episode scanners
+            _, labels = GEN.build(fam, seed)
+            attack_pairs = set()
+            for e in labels['episodes']:
+                if e['intent'] == 'attack' and e.get('target'):
+                    attack_pairs.add((GEN.ipb(e['scanner']), GEN.ipb(e['target'])))
+            for pair, ports in pair_ports.items():
+                if pair not in attack_pairs:
+                    worst = max(worst, len(ports))
+        return worst
+
+    def test_normal_sessions_fanout_capped(self):
+        self.assertLessEqual(self.max_distinct_ports_per_pair('normal-sessions'), 4)
+
+    def test_nat_nonshared_fanout_capped(self):
+        ev, labels = GEN.build('nat-shared-source', 0)
+        nat = GEN.ipb('192.0.2.20'); tgt = GEN.ipb('198.51.100.20')
+        pair_ports = {}
+        for r in read_pcap_frames(ev):
+            if r[6] == 0x02 and (r[1], r[2]) != (nat, tgt):
+                pair_ports.setdefault((r[1], r[2]), set()).add(r[5])
+        self.assertTrue(pair_ports)
+        self.assertLessEqual(max(len(v) for v in pair_ports.values()), 4)
+        # shared target retains its designed FP pressure: union >= 8 distinct
+        shared = {r[5] for r in read_pcap_frames(ev) if r[6] == 0x02 and (r[1], r[2]) == (nat, tgt)}
+        self.assertGreaterEqual(len(shared), 8)
+
+    def test_attack_background_fanout_capped(self):
+        for fam in ('fast-vertical-syn', 'slow-syn', 'horizontal-syn', 'xmas'):
+            self.assertLessEqual(self.max_distinct_ports_per_pair(fam), 4)
+
+
 class ChecksumTests(unittest.TestCase):
     def test_all_frames_valid_checksums(self):
         for fam in GEN.FAMILIES:
