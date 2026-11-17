@@ -250,6 +250,50 @@ class BenignFanoutInvariantTests(unittest.TestCase):
         for fam in ('fast-vertical-syn', 'slow-syn', 'horizontal-syn', 'xmas'):
             self.assertLessEqual(self.max_distinct_ports_per_pair(fam), 4)
 
+    def max_distinct_targets_per_srcport(self, fam, exclude_pairs=()):
+        worst = 0
+        for seed in range(6):
+            ev, labels = GEN.build(fam, seed)
+            attack_pairs = set()
+            for e in labels['episodes']:
+                if e['intent'] == 'attack' and e.get('target'):
+                    attack_pairs.add((GEN.ipb(e['scanner']), GEN.ipb(e['target'])))
+            srcport_hosts = {}
+            for r in read_pcap_frames(ev):
+                if r[6] == 0x02 and (r[1], r[2]) not in attack_pairs:
+                    srcport_hosts.setdefault((r[1], r[5]), set()).add(r[2])
+            for k, hosts in srcport_hosts.items():
+                worst = max(worst, len(hosts))
+        return worst
+
+    def test_normal_sessions_horizontal_fanout_capped(self):
+        self.assertLessEqual(self.max_distinct_targets_per_srcport('normal-sessions'), 4)
+
+    def test_nat_nonshared_horizontal_fanout_capped(self):
+        ev, labels = GEN.build('nat-shared-source', 0)
+        nat = GEN.ipb('192.0.2.20'); tgt = GEN.ipb('198.51.100.20')
+        srcport_hosts = {}
+        for r in read_pcap_frames(ev):
+            if r[6] == 0x02 and (r[1], r[2]) != (nat, tgt):
+                srcport_hosts.setdefault((r[1], r[5]), set()).add(r[2])
+        self.assertTrue(srcport_hosts)
+        self.assertLessEqual(max(len(v) for v in srcport_hosts.values()), 4)
+
+    def test_attack_background_horizontal_fanout_capped(self):
+        for fam in ('fast-vertical-syn', 'slow-syn', 'fin', 'null'):
+            self.assertLessEqual(self.max_distinct_targets_per_srcport(fam), 4)
+
+    def test_service_discovery_vertical_cap_only(self):
+        # Vertical stays <=4 per (src, host); horizontal is designed pressure:
+        # per (src, port) distinct hosts MAY reach 6..12 (expected-alert class
+        # under the v2 detector contract's horizontal key, spec Erratum E2).
+        ev, labels = GEN.build('service-discovery', 0)
+        srcport_hosts = {}
+        for r in read_pcap_frames(ev):
+            if r[6] == 0x02:
+                srcport_hosts.setdefault((r[1], r[5]), set()).add(r[2])
+        self.assertGreaterEqual(max(len(v) for v in srcport_hosts.values()), 3)
+
 
 class ChecksumTests(unittest.TestCase):
     def test_all_frames_valid_checksums(self):
