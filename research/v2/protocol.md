@@ -73,3 +73,41 @@ Before held-out generation or scoring, installed-engine inspection found that `p
 Activation pilot: an initial 120-refusal trace failed Zeek's positive assertion because documentation ranges are local under installed defaults. Preserve that failure. Increasing the control to 300 refusals made both engines alert without lowering any threshold. This is a development activation-control change, not a held-out corpus change. Final controls are 600 positive and 64 negative packets; both engines pass, with all IPv4/TCP checksums independently verified by TShark. Zeek warns that both deliberately control-only fixtures may be prefiltered; do not suppress or treat this smoke test as realistic traffic evidence. Gate A remains OPEN pending the independent evaluator contract/adapters/tests.
 
 Sources: https://community.zeek.org/t/scan-address-scan-scan-port-scan/7720 ; https://zeek.org/2026/09/how-attackers-learn-your-network-before-they-attack-it/ . No held-out data, lab captures, CIC scoring, v2 feature implementation or performance comparisons were performed before this amendment.
+
+## Amendment A2: benign-alert budget, 17 November 2026
+
+Fixed before any development operating-point selection, per the matching
+section's requirement. Validated against the generator implementation and the
+selection detector's key/window semantics (vertical (source, target) key,
+distinct destination ports within W, SYN-without-ACK qualifying probes,
+emit-once per key). Bounds below are construction invariants of this
+synthetic corpus (hardened by spec Erratum E1); they are not claims about
+real-world false-positive rates.
+
+1. **Unit and denominator.** Each benign control trace is one unit. The
+   budget is stated as alerts per unit, because benign traces run 600..4200 s
+   and a per-trace-hour rate would inflate short traces; alert counts per
+   trace-hour are reported alongside as descriptive statistics only.
+2. **Zero-tolerance class.** normal-sessions (12), few-port-retries (13),
+   service-discovery (16) and fin-ack-teardown (17): budget 0 alerts per unit.
+   Structural basis: 13 reaches at most 3 distinct ports per pair; 17 carries
+   no SYN-without-ACK probes; 16 reaches 2..4 distinct ports per (source,
+   host); 12 is capped at 4 distinct ports per pair by Erratum E1. Any alert
+   on this class disqualifies the operating point.
+3. **Expected-alert class.** approved-admin-scan (14) and nat-shared-source
+   (15) are designed to cross T; alerts land in the benign-FP column. Budget
+   binds burden: at most 1 alert per contiguous benign campaign segment, 0
+   duplicates within a segment. A segment is computed from ground-truth labels
+   only: the maximal run of an episode's probes whose consecutive gaps are
+   <= W for the candidate setting; it never depends on detector output.
+4. **Selection.** Among grid points (W in {10, 60, 300} s, T in {5, 10, 15,
+   20}) satisfying sections 2-3 on all development benign traces (seeds
+   0..9), select maximal development episode recall. Ties break by (a) fewer
+   expected-class alerts per unit, then (b) lexicographic (W descending, T
+   descending) for a stable predeclared choice. If no grid point satisfies
+   the budget, that outcome is reported as the result; the budget is not
+   relaxed after looking at scores.
+5. **Scope.** The budget governs only the v2 detector's (W, T) selection.
+   Zeek/Snort baselines are separately labeled and never tuned to it.
+   Held-out seeds 10..29 stay untouched until this amendment, the versioned
+   selection rule and development results are all frozen.
