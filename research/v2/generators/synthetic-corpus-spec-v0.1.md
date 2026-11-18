@@ -175,3 +175,20 @@ budget, before any v2 detector implementation or scoring run.
    union (8..40 distinct ports) crosses only T <= the realized union, and
    approved-admin-scan crosses every grid T. Budget accounting binds burden
    at settings where alerts occur.
+
+## Erratum E3, 18 November 2026
+
+Found by the first development selection run, before any result was frozen.
+
+1. **Label times now actual probe times.** Episode `first_probe_ns` /
+   `last_probe_ns` were recorded from nominal (pre-jitter) probe times while
+   packets carried jittered times, so detector alerts could fall before the
+   labeled episode start and be correctly rejected as `alert-before-episode`
+   by the evaluator's timing gate. Labels now record the minimum/maximum
+   actual (jittered) probe times; regression tests assert exact equality with
+   pcap contents for every episode.
+2. **Nanosecond pcap resolution.** Traces were written as
+   microsecond-resolution pcaps, quantizing integer-ns draw times to
+   microseconds and skewing the label/packet timebase by up to 999 ns.
+   Traces are now written with the nanosecond pcap magic (0xa1b23c4d) so
+   packet times and label times share the exact integer-ns timebase.
