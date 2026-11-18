@@ -17,7 +17,13 @@ _spec.loader.exec_module(GEN)
 def read_pcap(path):
     """Return list of (ts_ns, src, dst, proto, sport, dport, flags, frame_bytes)."""
     data = Path(path).read_bytes()
-    assert data[:4] == struct.pack('<I', 0xa1b2c3d4) and struct.unpack('<I', data[20:24])[0] == 1
+    if data[:4] == struct.pack('<I', 0xa1b2c3d4):
+        scale = 1000
+    elif data[:4] == struct.pack('<I', 0xa1b23c4d):
+        scale = 1
+    else:
+        raise AssertionError('bad pcap magic')
+    assert struct.unpack('<I', data[20:24])[0] == 1
     off, out = 24, []
     while off < len(data):
         sec, usec, incl, _ = struct.unpack('<IIII', data[off:off+16])
@@ -33,7 +39,7 @@ def read_pcap(path):
             flags = ip[33]
         elif proto == 17 and frag == 0:
             sport, dport = struct.unpack('!HH', ip[20:24])
-        out.append((sec*1_000_000_000 + usec*1000, src, dst, proto, sport, dport, flags, frame))
+        out.append((sec*1_000_000_000 + usec*scale, src, dst, proto, sport, dport, flags, frame))
     return out
 
 
@@ -293,6 +299,38 @@ class BenignFanoutInvariantTests(unittest.TestCase):
             if r[6] == 0x02:
                 srcport_hosts.setdefault((r[1], r[5]), set()).add(r[2])
         self.assertGreaterEqual(max(len(v) for v in srcport_hosts.values()), 3)
+
+
+class LabelTimeConsistencyTests(unittest.TestCase):
+    """Labels must record ACTUAL (jittered) probe times, and the pcap must
+    carry full nanosecond resolution: a microsecond-quantized pcap made
+    detector alerts look earlier than the episode start ('alert-before-episode').
+    """
+
+    def test_pcap_is_nanosecond_resolution(self):
+        for fam in GEN.FAMILIES:
+            ev, _ = GEN.build(fam, 0)
+            buf = tempfile.NamedTemporaryFile(delete=False)
+            GEN.write_pcap(buf.name, ev)
+            magic = Path(buf.name).read_bytes()[:4]
+            self.assertEqual(magic, struct.pack('<I', 0xa1b23c4d), fam)
+
+    def test_episode_bounds_match_actual_probe_times(self):
+        for fam in ('fast-vertical-syn', 'horizontal-syn', 'fin', 'null', 'xmas',
+                    'threshold-edge-syn', 'udp', 'distributed-syn', 'mixed-families'):
+            for seed in (0, 1):
+                ev, labels = GEN.build(fam, seed)
+                rows = read_pcap_frames(ev)
+                for e in labels['episodes']:
+                    scan = GEN.ipb(e['scanner'])
+                    if e.get('target'):
+                        tgt = GEN.ipb(e['target'])
+                        pts = [r[0] for r in rows if r[1] == scan and r[2] == tgt]
+                    else:
+                        pts = [r[0] for r in rows if r[1] == scan and r[5] == e['target_port']]
+                    self.assertTrue(pts, (fam, seed))
+                    self.assertEqual(e['first_probe_ns'], min(pts), (fam, seed))
+                    self.assertEqual(e['last_probe_ns'], max(pts), (fam, seed))
 
 
 class ChecksumTests(unittest.TestCase):
