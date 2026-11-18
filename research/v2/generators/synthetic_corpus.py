@@ -81,12 +81,14 @@ SYN, SYNACK, ACK, FINACK, RSTACK = 0x02, 0x12, 0x10, 0x11, 0x14
 FIN_ONLY, NULL_F, XMAS = 0x01, 0x00, 0x29
 
 def write_pcap(path, timed_frames_ns):
-    """timed_frames_ns: list of (t_ns_absolute, frame). Microsecond pcap, linktype 1."""
+    """timed_frames_ns: list of (t_ns_absolute, frame). Nanosecond-resolution
+    pcap (magic 0xa1b23c4d), linktype 1, so integer-ns draws and label times
+    are not quantized to microseconds."""
     timed_frames_ns = sorted(timed_frames_ns, key=lambda x: x[0])
-    out = struct.pack('<IHHIIII', 0xa1b2c3d4, 2, 4, 0, 0, 65535, 1)
+    out = struct.pack('<IHHIIII', 0xa1b23c4d, 2, 4, 0, 0, 65535, 1)
     for tns, frame in timed_frames_ns:
-        sec, usec = tns // 1_000_000_000, (tns % 1_000_000_000) // 1000
-        out += struct.pack('<IIII', sec, usec, len(frame), len(frame)) + frame
+        sec, nsec = tns // 1_000_000_000, tns % 1_000_000_000
+        out += struct.pack('<IIII', sec, nsec, len(frame), len(frame)) + frame
     Path(path).write_bytes(out)
 
 # --- session / probe builders -------------------------------------------------
@@ -215,9 +217,10 @@ def build(fam, seed):
         t = base_ns + 1_000_000_000
         first = last = None
         for p in ports:
-            ev += raw_probe(t + (jitter(rng) if fam not in ('slow-syn',) else 0), scan, tgt, rng.randint(20000, 60000), p, flags)
-            if first is None: first = t
-            last = t
+            ta = t + (jitter(rng) if fam not in ('slow-syn',) else 0)
+            ev += raw_probe(ta, scan, tgt, rng.randint(20000, 60000), p, flags)
+            if first is None or ta < first: first = ta
+            if last is None or ta > last: last = ta
             if fam == 'fast-vertical-syn' or fam in ('fin', 'null', 'xmas'):
                 t += rng.randint(10_000_000, 50_000_000)
             elif fam == 'slow-syn':
@@ -235,9 +238,10 @@ def build(fam, seed):
         port = rng.choice(PORT_POOL)
         t = base_ns + 1_000_000_000; first = last = None
         for h in hosts:
-            ev += raw_probe(t + jitter(rng), scan, h, rng.randint(20000, 60000), port, SYN)
-            if first is None: first = t
-            last = t
+            ta = t + jitter(rng)
+            ev += raw_probe(ta, scan, h, rng.randint(20000, 60000), port, SYN)
+            if first is None or ta < first: first = ta
+            if last is None or ta > last: last = ta
             t += rng.randint(20_000_000, 100_000_000)
         ep(cid + '-e0', 'attack', 'syn-horizontal', scan, first, last, tport=port, targets=hosts)
         span = last - base_ns
@@ -252,17 +256,19 @@ def build(fam, seed):
             if vertical:
                 ports = rng.sample(PORT_POOL, n)
                 for p in ports:
-                    ev += raw_probe(t + jitter(rng), scan, tgt, rng.randint(20000, 60000), p, SYN)
-                    if first is None: first = t
-                    last = t
+                    ta = t + jitter(rng)
+                    ev += raw_probe(ta, scan, tgt, rng.randint(20000, 60000), p, SYN)
+                    if first is None or ta < first: first = ta
+                    if last is None or ta > last: last = ta
                     t += rng.randint(20_000_000, 100_000_000)
                 ep('%s-e%d' % (cid, b), 'attack', 'syn', scan, first, last, target=tgt, campaign=cid + '-c0')
             else:
                 hosts = rng.sample(TARGET_NET, n)
                 for h in hosts:
-                    ev += raw_probe(t + jitter(rng), scan, h, rng.randint(20000, 60000), port, SYN)
-                    if first is None: first = t
-                    last = t
+                    ta = t + jitter(rng)
+                    ev += raw_probe(ta, scan, h, rng.randint(20000, 60000), port, SYN)
+                    if first is None or ta < first: first = ta
+                    if last is None or ta > last: last = ta
                     t += rng.randint(20_000_000, 100_000_000)
                 ep('%s-e%d' % (cid, b), 'attack', 'syn-horizontal', scan, first, last, tport=port,
                    targets=hosts, campaign=cid + '-c0')
@@ -275,9 +281,10 @@ def build(fam, seed):
         rng.shuffle(kinds)
         t = base_ns + 1_000_000_000; first = last = None
         for k, p in zip(kinds, ports):
-            ev += raw_probe(t + jitter(rng), scan, tgt, rng.randint(20000, 60000), p, k)
-            if first is None: first = t
-            last = t
+            ta = t + jitter(rng)
+            ev += raw_probe(ta, scan, tgt, rng.randint(20000, 60000), p, k)
+            if first is None or ta < first: first = ta
+            if last is None or ta > last: last = ta
             t += rng.randint(10_000_000, 50_000_000)
         ep(cid + '-e0', 'ambiguous', 'mixed-syn-fin', scan, first, last, target=tgt)
         span = last - base_ns
@@ -291,9 +298,10 @@ def build(fam, seed):
             t = base_ns + 1_000_000_000 + rng.randint(0, 5_000_000_000)
             first = last = None
             for p in ports:
-                ev += raw_probe(t + jitter(rng), sc, target, rng.randint(20000, 60000), p, SYN)
-                if first is None: first = t
-                last = t
+                ta = t + jitter(rng)
+                ev += raw_probe(ta, sc, target, rng.randint(20000, 60000), p, SYN)
+                if first is None or ta < first: first = ta
+                if last is None or ta > last: last = ta
                 t += rng.randint(500_000_000, 2_000_000_000)
             ep('%s-e%d' % (cid, k), 'attack', 'syn', sc, first, last, target=target,
                scope='out-of-scope-stress', campaign=cid + '-c0')
@@ -303,9 +311,10 @@ def build(fam, seed):
         ports = rng.sample(PORT_POOL, n)
         t = base_ns + 1_000_000_000; first = last = None
         for p in ports:
-            ev.append((t + jitter(rng), udp_frame(scan, tgt, rng.randint(20000, 60000), p)))
-            if first is None: first = t
-            last = t
+            ta = t + jitter(rng)
+            ev.append((ta, udp_frame(scan, tgt, rng.randint(20000, 60000), p)))
+            if first is None or ta < first: first = ta
+            if last is None or ta > last: last = ta
             t += rng.randint(10_000_000, 50_000_000)
         ep(cid + '-e0', 'attack', 'udp', scan, first, last, target=tgt, scope='out-of-scope-stress')
         span = last - base_ns
