@@ -143,3 +143,65 @@ qualification of A2. No results existed or exist for v2.
    non-shared sessions and attack-trace background, making the zero-tolerance
    invariants structural under the contract's keys. Family 16 keeps its
    designed 6..12-host pressure.
+
+## Amendment A3: baseline sensitivity diagnostic, 22 November 2026
+
+Accepted 22 November 2026 and frozen in local version control before the
+sensitivity run; remote publication follows separately. Motivating
+observations are development-set diagnostics, which this protocol permits
+(tuning and diagnostics use development data only). Throughout, "the Zeek
+baseline" means Zeek 8.0.11 plus the pinned third-party scanner packages
+(ncsa/bro-simple-scan 35cf19cf, ncsa/bro-is-darknet 7564a8f2) per Amendment
+A1, not generic Zeek capability; Zeek's detection behavior depends on the
+loaded policy.
+
+1. **What was observed.** Default-configuration baseline runs over
+   development seeds 0..9 (180 traces, frozen corpus, verified binary
+   digests): the Zeek baseline produced 0 alerts; Snort 3.13.2.0 port_scan
+   produced 10 alerts, all on approved-admin-scan; campaign recall 0.0 for
+   both; zero zero-tolerance violations; zero failed traces. Raw record:
+   results/raw/dev-baselines-2026-11-22.json. Mechanism for the Zeek null:
+   Zeek 8 defaults `Site::private_address_space_is_local = T`, copying the
+   IANA special-purpose registry (including the TEST-NET ranges this
+   synthetic corpus uses) into `Site::local_nets`; bro-simple-scan then
+   applies its local threshold (250 unique attempts) rather than the remote
+   threshold (25), and no development episode reaches 250. Confirmed by a
+   single-trace mechanism check (fast-vertical-syn-s0, development seed 0)
+   differing only in `private_address_space_is_local = F`, which raises
+   Scan::Port_Scan (70 unique attempts >= 25). That one trace is mechanism
+   confirmation, not a result.
+2. **Why a sensitivity diagnostic.** Without it the headline comparison
+   cannot be fairly interpreted: the Zeek-baseline null conflates detection
+   capability with a demonstrated interaction between the synthetic
+   addressing and Zeek 8's default local-address classification. Real
+   captures can also contain TEST-NET traffic (labs, misconfiguration,
+   spoofing), so no universal claim about real traffic is made; the
+   interaction is stated as observed for this corpus. The frozen corpus
+   cannot change, so the interaction can only be quantified, not removed.
+3. **Sensitivity run S1 (the entire scope).** Repeat the exact default
+   Zeek-baseline run (same binary, same pinned packages, same traces, same
+   matcher and contract gates) with the single added policy line `redef
+   Site::private_address_space_is_local = F;`. All detection thresholds and
+   suppression remain the package defaults. Snort has no variant: its
+   port_scan inspector has no local/remote address classification, so no
+   analogous interaction exists and its default run stands alone.
+4. **Leakage and scope controls.** Development seeds 0..9 only; held-out
+   seeds 10..29 are not generated, read, or scored for this amendment. The
+   frozen corpus, specification, evaluator contract, matcher, v2 detector
+   and the selected operating point (W=300, T=5) do not change regardless
+   of what S1 shows. S1 output is never used to tune W/T, select baselines
+   or modify the v2 detector; it is reported as a separately labeled
+   sensitivity diagnostic (results/raw/dev-baselines-sensitivity-2026-11-22.json),
+   never merged into the default-configuration headline numbers, never
+   presented as held-out or deployment performance, and preserved and
+   published raw whatever its direction. Because the default results are
+   confounded by the addressing interaction, neither the default nor the S1
+   numbers support an unqualified headline superiority claim; any
+   comparative statement names the configuration and this interaction.
+5. **Rationale for the single knob.** `private_address_space_is_local` is a
+   deployment-environment setting (zeekctl deployments set Site::local_nets
+   explicitly), not a detection parameter. Flipping it isolates the
+   addressing interaction while leaving every detection threshold at its
+   shipped default: the minimal change that makes the baseline comparison
+   interpretable. Any further variation (thresholds, suppression,
+   sensitivity levels) would constitute tuning and remains out of scope.
