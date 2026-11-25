@@ -38,6 +38,17 @@ def dns6_frame():
     return ipv6_frame(17, udp, dst='2001:db8::53')
 
 
+
+
+def compressed_dns_frame():
+    # Two questions in one query: demo.test A, then www.demo.test AAAA using a
+    # compression pointer back to the first name at message offset 12.
+    q1 = b'\x04demo\x04test\x00' + struct.pack('!HH', 1, 1)
+    q2 = b'\x03www\xc0\x0c' + struct.pack('!HH', 28, 1)
+    dns = struct.pack('!6H', 1, 0x0100, 2, 0, 0, 0) + q1 + q2
+    udp = struct.pack('!4H', 53000, 53, 8 + len(dns), 0) + dns
+    return demo.frame(17, udp, dst='203.0.113.53')
+
 class CaptureTests(unittest.TestCase):
     def setUp(self):
         self.temp=tempfile.TemporaryDirectory()
@@ -159,8 +170,42 @@ class CaptureTests(unittest.TestCase):
         self.write([bytes(f)])
         self.assertEqual(self.run_report()['stats']['skipped_by_reason'],{'malformed-tcp':1})
     def test_dns_bounds(self):
-        for data in (b'',b'\0'*12,b'\0'*4+b'\0\1'+b'\0'*6+b'\xc0\x00',b'\0'*4+b'\0\1'+b'\0'*6+b'\x40'+b'x'*64):
-            self.assertIsNone(wb.dns_question(data))
+        for data in (b'',b'\0'*12,b'\0'*4+b'\0\1'+b'\0'*6+b'\xc0\x00',b'\0'*4+b'\0\1'+b'\0'*6+b'\x40'+b'x'*64,b'\0'*4+b'\0\1'+b'\0'*6+b'\xc0'):
+            self.assertEqual(wb.dns_questions(data),[])
+    def test_dns_multi_question_and_compression(self):
+        q1=b'\x04demo\x04test\x00'+struct.pack('!HH',1,1)
+        q2=b'\x03www\xc0\x0c'+struct.pack('!HH',28,1)
+        msg=struct.pack('!6H',1,0x0100,2,0,0,0)+q1+q2
+        self.assertEqual(wb.dns_questions(msg),[(b'demo.test',1),(b'www.demo.test',28)])
+    def test_dns_pointer_loop_and_hop_cap(self):
+        loop=struct.pack('!6H',1,0x0100,1,0,0,0)+b'\xc0\x0c'+struct.pack('!HH',1,1)
+        self.assertEqual(wb.dns_questions(loop),[])
+        chain=struct.pack('!6H',1,0x0100,1,0,0,0)
+        for i in range(20):
+            chain+=bytes([0xc0,12+2*i+2])
+        chain+=b'\x00'+struct.pack('!HH',1,1)
+        self.assertEqual(wb.dns_questions(chain),[])
+    def test_dns_pointer_out_of_bounds(self):
+        msg=struct.pack('!6H',1,0x0100,1,0,0,0)+b'\x03www\xc0\xff'+struct.pack('!HH',1,1)
+        self.assertEqual(wb.dns_questions(msg),[])
+    def test_dns_partial_second_question(self):
+        q1=b'\x04demo\x04test\x00'+struct.pack('!HH',1,1)
+        msg=struct.pack('!6H',1,0x0100,2,0,0,0)+q1+b'\x03ww'
+        self.assertEqual(wb.dns_questions(msg),[(b'demo.test',1)])
+    def test_dns_response_not_counted(self):
+        q=b'\x04demo\x04test\x00'+struct.pack('!HH',1,1)
+        msg=struct.pack('!6H',1,0x8180,1,0,0,0)+q
+        self.assertEqual(wb.dns_questions(msg),[])
+    def test_dns_question_cap(self):
+        q=b'\x04demo\x04test\x00'+struct.pack('!HH',1,1)
+        msg=struct.pack('!6H',1,0x0100,100,0,0,0)+q*100
+        self.assertEqual(len(wb.dns_questions(msg)),64)
+    def test_compressed_dns_pipeline(self):
+        self.write([compressed_dns_frame()])
+        report=self.run_report()
+        self.assertEqual(report['stats']['dns_questions'],2)
+        self.assertEqual(sorted(row['query_type'] for row in report['dns_queries']),[1,28])
+        self.assertTrue(all(row['queries']==1 for row in report['dns_queries']))
     def test_cli_exit_codes(self):
         self.write([])
         with contextlib.redirect_stdout(io.StringIO()):self.assertEqual(wb.main([str(self.path)]),0)
