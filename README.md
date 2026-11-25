@@ -30,7 +30,7 @@ Exit codes: **0** = no heuristic alerts in the decoded scope; **1** = review ale
 - PCAPNG major version 1: all sections, each with its own byte order and interface table; Ethernet interfaces and Enhanced Packet Blocks with micro/nanosecond timestamps; little/big endian. Simple Packet Blocks carry no timestamps and are skipped with a notice, as are name-resolution, statistics and unknown block types. Packet numbers stay continuous across sections, so evidence references still point at one capture.
 - Ethernet IPv4/IPv6 with up to two VLAN tags; complete unfragmented TCP/UDP packets. IPv6 extension headers are intentionally skipped.
 - Directional five-tuple flows (source/target address, source/target port, protocol), packet counts and IPv4/IPv6 byte counts. Top 20 by bytes.
-- First uncompressed DNS question in UDP destination port 53; top 20 query-name/type counts. Names are pseudonymized, not printed.
+- All questions in each DNS query message to UDP destination port 53, including compression-pointer names decoded with loop and hop caps; top 20 query-name/type counts. Names are pseudonymized, not printed.
 - Inclusive sliding-window TCP SYN-without-ACK rule: at least 10 distinct destination ports from one source to one target within 60 seconds, by default. Retransmissions to the same port do not increase the distinct-port count.
 - JSON/text reports, parser bounds, packet-number evidence and generic error messages.
 
@@ -44,7 +44,7 @@ The first two commands produce no scan alert for the demo. This is a threshold d
 
 ## Coverage and honest limits
 
-Linux cooked capture, raw-IP link types, ARP, IPv4/IPv6 fragments, IPv6 extension headers and jumbo payloads, TCP stream reassembly, TCP DNS, encrypted-DNS interpretation, compressed DNS question names and HTTP/TLS parsing are unsupported. PCAPNG support is limited to major version 1, Ethernet link type 1 and micro/nanosecond timestamp resolution; interfaces with other link types or timestamp bases have their packets skipped with notices. A later section declaring another major version, or anything past 4096 sections, stops the read with a notice while keeping the packets decoded so far. Unsupported/malformed packets are counted by reason. Checksums are not validated. TCP flags describe observed packets, not successful connections. A source/target pair is alerted once per report; separate later bursts are not separate alerts.
+Linux cooked capture, raw-IP link types, ARP, IPv4/IPv6 fragments, IPv6 extension headers and jumbo payloads, TCP stream reassembly, TCP DNS, encrypted-DNS interpretation, extended-label (0x40/0x80) DNS names and HTTP/TLS parsing are unsupported. DNS messages declaring more than 64 questions have the rest ignored; questions that stop parsing mid-message still count the ones decoded. PCAPNG support is limited to major version 1, Ethernet link type 1 and micro/nanosecond timestamp resolution; interfaces with other link types or timestamp bases have their packets skipped with notices. A later section declaring another major version, or anything past 4096 sections, stops the read with a notice while keeping the packets decoded so far. Unsupported/malformed packets are counted by reason. Checksums are not validated. TCP flags describe observed packets, not successful connections. A source/target pair is alerted once per report; separate later bursts are not separate alerts.
 
 Snap-length truncation counts are visible. Packets too short for their advertised IPv4/IPv6 size are skipped; malformed record framing stops analysis with a notice. Default input bounds are 100,000 records and 64 MiB of consumed record data including headers. Declared snap length is capped at 16 MiB. Valid records/events are held in memory for sorting, so this is not a large-capture streaming engine. Top-20 displays do not show every flow/query, though total counts are reported.
 
@@ -54,9 +54,9 @@ Only analyze captures you own, are authorized to inspect, or that were intention
 
 ## Tests and next milestones
 
-47 synthetic tests cover all four classic file magic variants, PCAPNG endian/timestamp variants, multi-section captures (byte-order changes, per-section interface tables, malformed or unsupported later sections) and block handling, VLANs, IPv4/IPv6, IPv6 extension/fragment skips, malformed framing/transport headers, DNS bounds, resource limits, redaction, port thresholds, inclusive windows, repeated ports, SYN/ACK exclusion, exit states and overwrite protection. CI runs on Windows 2022 and Ubuntu 24.04 with Python 3.10-3.13.
+54 synthetic tests cover all four classic file magic variants, PCAPNG endian/timestamp variants, multi-section captures (byte-order changes, per-section interface tables, malformed or unsupported later sections) and block handling, VLANs, IPv4/IPv6, IPv6 extension/fragment skips, malformed framing/transport headers, DNS bounds, compression pointers/loops/hop caps, multi-question messages, resource limits, redaction, port thresholds, inclusive windows, repeated ports, SYN/ACK exclusion, exit states and overwrite protection. CI runs on Windows 2022 and Ubuntu 24.04 with Python 3.10-3.13.
 
-Next real work: richer DNS decoding; bidirectional sessions and Zeek-log import; a local investigation UI and timeline; benchmarks against known safe capture fixtures. These are roadmap items, not delivered features. Learn the binary parser, five-tuple grouping and window rule before claiming interview ownership or production deployment.
+Next real work: bidirectional sessions and Zeek-log import; a local investigation UI and timeline; benchmarks against known safe capture fixtures. These are roadmap items, not delivered features. Learn the binary parser, five-tuple grouping and window rule before claiming interview ownership or production deployment.
 
 ## Reproducible port-scan study artifacts (revision 3)
 
