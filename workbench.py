@@ -275,11 +275,6 @@ def dns_questions(data, max_questions=64):
     return found
 
 
-def dns_question(data):
-    """First question of a query message, or None. Kept for callers of the old API."""
-    found = dns_questions(data)
-    return found[0] if found else None
-
 
 def decode_packet(packet):
     data = packet['data']
