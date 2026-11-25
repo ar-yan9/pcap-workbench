@@ -1,0 +1,339 @@
+{
+  "purpose": "activation controls only, not research accuracy/performance",
+  "status": "passed",
+  "start_utc": "2026-11-25T03:58:55.999795+00:00",
+  "commands": [
+    {
+      "argv": [
+        "/downloads/portscan-v2-execution/engines/run-prefix/opt/zeek/bin/zeek",
+        "--version"
+      ],
+      "start_utc": "2026-11-25T03:58:56.263914+00:00",
+      "end_utc": "2026-11-25T03:58:56.279570+00:00",
+      "elapsed_seconds": 0.015653370000109135,
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": "version-zeek.stdout",
+      "stderr": "version-zeek.stderr"
+    },
+    {
+      "argv": [
+        "/downloads/portscan-v2-execution/engines/run-prefix/bin/snort",
+        "-V"
+      ],
+      "start_utc": "2026-11-25T03:58:56.279836+00:00",
+      "end_utc": "2026-11-25T03:58:56.295500+00:00",
+      "elapsed_seconds": 0.015672760999905222,
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": "version-snort.stdout",
+      "stderr": "version-snort.stderr"
+    },
+    {
+      "argv": [
+        "/downloads/portscan-v2-execution/engines/run-prefix/usr/bin/tshark",
+        "--version"
+      ],
+      "start_utc": "2026-11-25T03:58:56.295813+00:00",
+      "end_utc": "2026-11-25T03:58:56.409828+00:00",
+      "elapsed_seconds": 0.11402397199981351,
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": "version-tshark.stdout",
+      "stderr": "version-tshark.stderr"
+    },
+    {
+      "argv": [
+        "/downloads/portscan-v2-execution/engines/run-prefix/bin/snort",
+        "--daq-dir",
+        "/downloads/portscan-v2-execution/engines/run-prefix/lib/daq",
+        "-T",
+        "-c",
+        "/downloads/portscan-v2-execution/engines/activation-2026-11-22/snort.lua"
+      ],
+      "start_utc": "2026-11-25T03:58:56.417907+00:00",
+      "end_utc": "2026-11-25T03:58:56.481706+00:00",
+      "elapsed_seconds": 0.06379861599998549,
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": "validate-snort.stdout",
+      "stderr": "validate-snort.stderr"
+    },
+    {
+      "argv": [
+        "/downloads/portscan-v2-execution/engines/run-prefix/usr/bin/tshark",
+        "-r",
+        "/downloads/portscan-v2-execution/engines/activation-2026-11-22/pcaps/positive.pcap",
+        "-o",
+        "tcp.check_checksum:TRUE",
+        "-o",
+        "ip.check_checksum:TRUE",
+        "-T",
+        "fields",
+        "-e",
+        "frame.number",
+        "-e",
+        "tcp.checksum.status",
+        "-e",
+        "ip.checksum.status"
+      ],
+      "start_utc": "2026-11-25T03:58:56.481741+00:00",
+      "end_utc": "2026-11-25T03:58:56.596289+00:00",
+      "elapsed_seconds": 0.1145580009999776,
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": "checksum-positive.stdout",
+      "stderr": "checksum-positive.stderr"
+    },
+    {
+      "argv": [
+        "/downloads/portscan-v2-execution/engines/run-prefix/opt/zeek/bin/zeek",
+        "-r",
+        "/downloads/portscan-v2-execution/engines/activation-2026-11-22/pcaps/positive.pcap",
+        "/downloads/portscan-v2-execution/engines/activation-2026-11-22/scanner.zeek"
+      ],
+      "start_utc": "2026-11-25T03:58:56.596642+00:00",
+      "end_utc": "2026-11-25T03:58:56.860769+00:00",
+      "elapsed_seconds": 0.2641341499997907,
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": "run.stdout",
+      "stderr": "run.stderr",
+      "directory": "zeek-positive"
+    },
+    {
+      "argv": [
+        "/downloads/portscan-v2-execution/engines/run-prefix/bin/snort",
+        "--daq-dir",
+        "/downloads/portscan-v2-execution/engines/run-prefix/lib/daq",
+        "-c",
+        "/downloads/portscan-v2-execution/engines/activation-2026-11-22/snort.lua",
+        "-r",
+        "/downloads/portscan-v2-execution/engines/activation-2026-11-22/pcaps/positive.pcap",
+        "-l",
+        "/downloads/portscan-v2-execution/engines/activation-2026-11-22/snort-positive"
+      ],
+      "start_utc": "2026-11-25T03:58:56.861583+00:00",
+      "end_utc": "2026-11-25T03:58:56.925687+00:00",
+      "elapsed_seconds": 0.0641096640001706,
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": "run.stdout",
+      "stderr": "run.stderr",
+      "directory": "snort-positive"
+    },
+    {
+      "argv": [
+        "/downloads/portscan-v2-execution/engines/run-prefix/usr/bin/tshark",
+        "-r",
+        "/downloads/portscan-v2-execution/engines/activation-2026-11-22/pcaps/negative.pcap",
+        "-o",
+        "tcp.check_checksum:TRUE",
+        "-o",
+        "ip.check_checksum:TRUE",
+        "-T",
+        "fields",
+        "-e",
+        "frame.number",
+        "-e",
+        "tcp.checksum.status",
+        "-e",
+        "ip.checksum.status"
+      ],
+      "start_utc": "2026-11-25T03:58:56.926268+00:00",
+      "end_utc": "2026-11-25T03:58:57.040134+00:00",
+      "elapsed_seconds": 0.11387389700007589,
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": "checksum-negative.stdout",
+      "stderr": "checksum-negative.stderr"
+    },
+    {
+      "argv": [
+        "/downloads/portscan-v2-execution/engines/run-prefix/opt/zeek/bin/zeek",
+        "-r",
+        "/downloads/portscan-v2-execution/engines/activation-2026-11-22/pcaps/negative.pcap",
+        "/downloads/portscan-v2-execution/engines/activation-2026-11-22/scanner.zeek"
+      ],
+      "start_utc": "2026-11-25T03:58:57.040316+00:00",
+      "end_utc": "2026-11-25T03:58:57.304514+00:00",
+      "elapsed_seconds": 0.2642094670000006,
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": "run.stdout",
+      "stderr": "run.stderr",
+      "directory": "zeek-negative"
+    },
+    {
+      "argv": [
+        "/downloads/portscan-v2-execution/engines/run-prefix/bin/snort",
+        "--daq-dir",
+        "/downloads/portscan-v2-execution/engines/run-prefix/lib/daq",
+        "-c",
+        "/downloads/portscan-v2-execution/engines/activation-2026-11-22/snort.lua",
+        "-r",
+        "/downloads/portscan-v2-execution/engines/activation-2026-11-22/pcaps/negative.pcap",
+        "-l",
+        "/downloads/portscan-v2-execution/engines/activation-2026-11-22/snort-negative"
+      ],
+      "start_utc": "2026-11-25T03:58:57.304776+00:00",
+      "end_utc": "2026-11-25T03:58:57.368919+00:00",
+      "elapsed_seconds": 0.06415113800017025,
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": "run.stdout",
+      "stderr": "run.stderr",
+      "directory": "snort-negative"
+    }
+  ],
+  "checks": {
+    "checksum-positive": {
+      "packets": 600,
+      "ipv4_good": 600,
+      "tcp_good": 600
+    },
+    "zeek-positive": {
+      "connections": 300,
+      "accounted_packets": 600,
+      "scan_alerts": 1,
+      "scan_records": [
+        {
+          "ts": "1700000024.910000",
+          "uid": "-",
+          "id.orig_h": "-",
+          "id.orig_p": "-",
+          "id.resp_h": "-",
+          "id.resp_p": "-",
+          "fuid": "-",
+          "file_mime_type": "-",
+          "file_desc": "-",
+          "proto": "-",
+          "note": "Scan::Port_Scan",
+          "msg": "192.0.2.1 scanned at least 250 unique ports on host 198.51.100.2 in 0m25s",
+          "sub": "local",
+          "src": "192.0.2.1",
+          "dst": "-",
+          "p": "-",
+          "n": "-",
+          "peer_descr": "-",
+          "actions": "Notice::ACTION_LOG",
+          "email_dest": "(empty)",
+          "suppress_for": "3600.000000",
+          "remote_location.country_code": "-",
+          "remote_location.region": "-",
+          "remote_location.city": "-",
+          "remote_location.latitude": "-",
+          "remote_location.longitude": "-"
+        }
+      ]
+    },
+    "snort-positive": {
+      "received": 600,
+      "analyzed": 600,
+      "scan_alerts": 1,
+      "scan_records": [
+        {
+          "timestamp": "11/14-22:13:21.400000",
+          "seconds": 1700000001,
+          "pkt_num": 29,
+          "proto": "TCP",
+          "src_addr": "192.0.2.1",
+          "dst_addr": "198.51.100.2",
+          "src_port": 40014,
+          "dst_port": 1014,
+          "gid": 122,
+          "sid": 1,
+          "msg": "(port_scan) TCP portscan"
+        }
+      ]
+    },
+    "checksum-negative": {
+      "packets": 64,
+      "ipv4_good": 64,
+      "tcp_good": 64
+    },
+    "zeek-negative": {
+      "connections": 12,
+      "accounted_packets": 64,
+      "scan_alerts": 0,
+      "scan_records": []
+    },
+    "snort-negative": {
+      "received": 64,
+      "analyzed": 64,
+      "scan_alerts": 0,
+      "scan_records": []
+    }
+  },
+  "source_revision": "48851a8e3519fcc602df3c9fa38be34e6662923c",
+  "binary_sha256": {
+    "zeek": "f05433a7c88de8b9a70b64f16089c57508aa6a5084cd0ca47454292619b5fe4c",
+    "snort": "f38f8adf7a66509974162cc37021644e1580860332573d19aa0f0a1af494db7c",
+    "tshark": "a65608d17a78f255c7a9aaa08244f3fe284ce752f6818fd87fee9ca6e5bb4d54"
+  },
+  "runner_sha256": "9173e864786bfeb66d288308ddf5629be85e86550d89c8d6d8558cce62bd6435",
+  "generator_sha256": "285c609c2e76be5a220027fdeec6f074b64c6a9aebb8ce2c98b712ae51764e2f",
+  "source_dirty": false,
+  "scanner_pins": {
+    "bro-simple-scan": "35cf19cf64ba9f9989022a56dce0c8ad6ae2f3f2",
+    "bro-is-darknet": "7564a8f2035aa62359199b64086ff14749f35f73"
+  },
+  "corpus": {
+    "purpose": "baseline activation only; not held-out research data",
+    "linktype": 1,
+    "checksums": "IPv4 and TCP independently asserted valid",
+    "positive": {
+      "filename": "positive.pcap",
+      "packets": 600,
+      "sha256": "444641f7d8b70237b4487c9775a437e649b98224d18927458e1e6db46723ba8e"
+    },
+    "negative": {
+      "filename": "negative.pcap",
+      "packets": 64,
+      "sha256": "f1babb767bff24579996482bbbc9f08bdda9a1520da13f58dd82c640a02cc72d"
+    }
+  },
+  "config_sha256": {
+    "zeek_loader": "72a6e58769a5fc1828d4d5272260a6927ce4dfc706e07334ca0ed58fea474c6a",
+    "snort_control": "02c61af1b8d8496336b61e39a4205e3c24c1643967c66307422c8c1d9411f230",
+    "snort_defaults": "6dc2ec6f286c374678ed907bd18bf2e4ea1f9f4437a82cd31af361974ecac9bf",
+    "snort_main": "ae242e7b84ac05b20f4b3393bfaea1ac3f161e8dbbce48819ea27dfcecec6f48"
+  },
+  "end_utc": "2026-11-25T03:58:57.369135+00:00",
+  "file_sha256": {
+    "checksum-negative.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "checksum-negative.stdout": "4c856d3bbd14f96f25ddbb3a935d8698e35f2393f82bff56de14c3be92687a36",
+    "checksum-positive.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "checksum-positive.stdout": "5c6b117198da971388ce73eb716fca3d7afdc44d325e371d0ceb67069aecdef1",
+    "pcaps/manifest.json": "18560091c785ef6544b885a7c91e76fd142b88c52f68bb887ec6139b3efb8614",
+    "pcaps/negative.pcap": "f1babb767bff24579996482bbbc9f08bdda9a1520da13f58dd82c640a02cc72d",
+    "pcaps/positive.pcap": "444641f7d8b70237b4487c9775a437e649b98224d18927458e1e6db46723ba8e",
+    "scanner.zeek": "72a6e58769a5fc1828d4d5272260a6927ce4dfc706e07334ca0ed58fea474c6a",
+    "snort-negative/alert_json.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "snort-negative/run.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "snort-negative/run.stdout": "8f8d0f92179564698bb300b19e510da6fc711d4210831c2aeaa617c7bf2fd6e8",
+    "snort-positive/alert_json.txt": "4618df59fa5806d509331a6cd15632947ba002a77936c492bfb13523d8d4c9cd",
+    "snort-positive/run.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "snort-positive/run.stdout": "8cbb184ab323e88a0a94863b883587cbcfd995cda79528382a85651e7eccf487",
+    "snort.lua": "02c61af1b8d8496336b61e39a4205e3c24c1643967c66307422c8c1d9411f230",
+    "validate-snort.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "validate-snort.stdout": "e3d5110eeea492f2127ab2477897fbbc7f12145ad910c14e06a6da9503599812",
+    "version-snort.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "version-snort.stdout": "8b92d4dbcf56d241b6bb33a398ccafe3fbfddb7cfc750ff484b4806cc72deb34",
+    "version-tshark.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "version-tshark.stdout": "09da162031d727c031412a52909e3c07f23b6e866d4664685a68d2917d3f504b",
+    "version-zeek.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "version-zeek.stdout": "fb3682d418c5d30b84a032ffb85340a91417aef7fa12fe4a9eaa1cdcf0d3b011",
+    "zeek-negative/conn.log": "8968763eb12e0408fad2d4dd727f4edf1cf1059a86253abe0bd1c5ec6bddff64",
+    "zeek-negative/packet_filter.log": "6fc4e290b94d4fc31460776833b5385b0bf9b1184ac62be81d77a781ae013e4b",
+    "zeek-negative/reporter.log": "8e972c0f7f2b1a6653da2f9de43535a50e83a8368a95db39072d60268d8e6d04",
+    "zeek-negative/run.stderr": "5bde102f92616547164ab013859a97ba34dfe0cc2da4cc1414fe45294972481b",
+    "zeek-negative/run.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "zeek-positive/conn.log": "64ee918fb879f57c6178ac87a9952aa3bce69dce80ab5fd9e04d84793f70893c",
+    "zeek-positive/notice.log": "898efaf64d64d65cff815e0d708ec1690f4017a18632ed5320e06e2b0b10cb4c",
+    "zeek-positive/packet_filter.log": "afa4416856316fa5a02351d49d15ebabd6802dd31022694f698bf63e1a7db73b",
+    "zeek-positive/reporter.log": "64ea225272ac6248250a10dc3f76274eca8611c92d9e2df304c4bfe3252103f0",
+    "zeek-positive/run.stderr": "332cc73bc7c3265795b15406401b612f888399a9f46e3c60a94b394efdf8e7f0",
+    "zeek-positive/run.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}
