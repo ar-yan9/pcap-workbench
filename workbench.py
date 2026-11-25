@@ -214,30 +214,71 @@ def _read_pcapng(stream, max_packets, max_bytes):
     return packets, notices, 'pcapng'
 
 
-def dns_question(data):
-    """First uncompressed DNS question only. Never expose its text in a report."""
-    if len(data) < 12:
-        return None
-    _, flags, questions, _, _, _ = struct.unpack('!6H', data[:12])
-    if flags & 0x8000 or questions == 0:
-        return None
-    labels, cursor = [], 12
-    while cursor < len(data):
+def _dns_name(data, cursor, max_hops=16):
+    """One RFC 1035 name at cursor, following compression pointers safely.
+
+    Returns (lowercase name bytes, cursor after the wire form) or None.
+    Pointer targets are visited at most once and hops are capped, so loops
+    and pointer chains cannot hang decoding; the reassembled name keeps the
+    253-byte wire limit. Extended labels (0x40/0x80) stay unsupported.
+    """
+    labels, seen, end = [], set(), None
+    while True:
+        if cursor >= len(data):
+            return None
         size = data[cursor]
+        if size & 0xC0 == 0xC0:
+            if cursor+2 > len(data):
+                return None
+            target = ((size & 0x3F) << 8) | data[cursor+1]
+            if target in seen or len(seen) >= max_hops:
+                return None
+            seen.add(target)
+            if end is None:
+                end = cursor+2
+            cursor = target
+            continue
+        if size & 0xC0:
+            return None
         cursor += 1
         if size == 0:
-            if not labels or cursor+4 > len(data):
-                return None
-            name = b'.'.join(labels)
-            if len(name) > 253:
-                return None
-            return name.lower(), struct.unpack('!H', data[cursor:cursor+2])[0]
-        # Compressed names, extended labels and oversized labels unsupported.
-        if size > 63 or cursor+size > len(data):
+            break
+        if cursor+size > len(data):
             return None
         labels.append(data[cursor:cursor+size])
         cursor += size
-    return None
+    name = b'.'.join(labels)
+    if not name or len(name) > 253:
+        return None
+    return name.lower(), (cursor if end is None else end)
+
+
+def dns_questions(data, max_questions=64):
+    """All questions in one DNS query message. Never expose text in a report.
+
+    Responses and messages whose questions run past max_questions or stop
+    parsing mid-way still yield the questions decoded so far.
+    """
+    if len(data) < 12:
+        return []
+    _, flags, count, _, _, _ = struct.unpack('!6H', data[:12])
+    if flags & 0x8000:
+        return []
+    found, cursor = [], 12
+    for _ in range(min(count, max_questions)):
+        decoded = _dns_name(data, cursor)
+        if decoded is None or decoded[1]+4 > len(data):
+            break
+        name, cursor = decoded
+        found.append((name, struct.unpack('!H', data[cursor:cursor+2])[0]))
+        cursor += 4
+    return found
+
+
+def dns_question(data):
+    """First question of a query message, or None. Kept for callers of the old API."""
+    found = dns_questions(data)
+    return found[0] if found else None
 
 
 def decode_packet(packet):
@@ -303,9 +344,9 @@ def decode_packet(packet):
             return None, 'malformed-udp'
         event.update(sport=struct.unpack('!H',payload[:2])[0], dport=struct.unpack('!H',payload[2:4])[0])
         if event['dport'] == 53:
-            query = dns_question(payload[8:udp_length])
-            if query:
-                event.update(dns_name=query[0], dns_type=query[1])
+            found = dns_questions(payload[8:udp_length])
+            if found:
+                event['dns_questions'] = found
     else:
         return None, 'unsupported-transport'
     return event, None
@@ -342,8 +383,8 @@ def investigate(path, window=60, ports=10, max_packets=100000, max_bytes=64*1024
         flow['packets'] += 1
         flow['ip_bytes'] += event['bytes']
         flow['last'] = event['time_ns']
-        if 'dns_name' in event:
-            queries[(event['dns_name'],event['dns_type'])] += 1
+        for name, query_type in event.get('dns_questions', ()):
+            queries[(name,query_type)] += 1
         if event['protocol'] == 'TCP' and event['syn'] and not event['ack']:
             pair=(event['src'],event['dst'])
             queue=queues[pair]
