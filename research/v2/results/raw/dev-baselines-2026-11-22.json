@@ -1,0 +1,72 @@
+{
+ "binary_sha256": {
+  "snort": "f38f8adf7a66509974162cc37021644e1580860332573d19aa0f0a1af494db7c",
+  "zeek": "f05433a7c88de8b9a70b64f16089c57508aa6a5084cd0ca47454292619b5fe4c"
+ },
+ "burden_window_s": 300,
+ "engines": {
+  "snort-3.13.2.0 port_scan inspector defaults": {
+   "campaigns_matched": 0,
+   "campaigns_total": 80,
+   "expected_alert_units": 10,
+   "expected_duplicate_burden": 0,
+   "failed_traces": [],
+   "per_family": {
+    "approved-admin-scan": 10,
+    "distributed-syn": 0,
+    "fast-vertical-syn": 0,
+    "few-port-retries": 0,
+    "fin": 0,
+    "fin-ack-teardown": 0,
+    "horizontal-syn": 0,
+    "mixed-families": 0,
+    "nat-shared-source": 0,
+    "normal-sessions": 0,
+    "null": 0,
+    "repeated-horizontal-bursts": 0,
+    "repeated-vertical-bursts": 0,
+    "service-discovery": 0,
+    "slow-syn": 0,
+    "threshold-edge-syn": 0,
+    "udp": 0,
+    "xmas": 0
+   },
+   "recall": 0.0,
+   "total_alerts": 10,
+   "zero_tolerance_violations": []
+  },
+  "zeek-8.0.11+bro-simple-scan(35cf19cf)+bro-is-darknet(7564a8f2) defaults": {
+   "campaigns_matched": 0,
+   "campaigns_total": 80,
+   "expected_alert_units": 0,
+   "expected_duplicate_burden": 0,
+   "failed_traces": [],
+   "per_family": {
+    "approved-admin-scan": 0,
+    "distributed-syn": 0,
+    "fast-vertical-syn": 0,
+    "few-port-retries": 0,
+    "fin": 0,
+    "fin-ack-teardown": 0,
+    "horizontal-syn": 0,
+    "mixed-families": 0,
+    "nat-shared-source": 0,
+    "normal-sessions": 0,
+    "null": 0,
+    "repeated-horizontal-bursts": 0,
+    "repeated-vertical-bursts": 0,
+    "service-discovery": 0,
+    "slow-syn": 0,
+    "threshold-edge-syn": 0,
+    "udp": 0,
+    "xmas": 0
+   },
+   "recall": 0.0,
+   "total_alerts": 0,
+   "zero_tolerance_violations": []
+  }
+ },
+ "purpose": "baseline comparison at pinned default configs; never tuned to W/T",
+ "seeds": "0..9",
+ "split": "development"
+}
