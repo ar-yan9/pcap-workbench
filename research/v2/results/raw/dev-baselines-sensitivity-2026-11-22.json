@@ -1,0 +1,42 @@
+{
+ "amendment": "A3 (protocol.md, frozen 22 November 2026 before this run)",
+ "binary_sha256": {
+  "zeek": "f05433a7c88de8b9a70b64f16089c57508aa6a5084cd0ca47454292619b5fe4c"
+ },
+ "burden_window_s": 300,
+ "engines": {
+  "zeek-8.0.11+bro-simple-scan(35cf19cf)+bro-is-darknet(7564a8f2) A3-S1 sensitivity: only private_address_space_is_local=F, all detection thresholds at package defaults": {
+   "campaigns_matched": 33,
+   "campaigns_total": 80,
+   "expected_alert_units": 22,
+   "expected_duplicate_burden": 0,
+   "failed_traces": [],
+   "per_family": {
+    "approved-admin-scan": 10,
+    "distributed-syn": 0,
+    "fast-vertical-syn": 10,
+    "few-port-retries": 0,
+    "fin": 0,
+    "fin-ack-teardown": 0,
+    "horizontal-syn": 3,
+    "mixed-families": 0,
+    "nat-shared-source": 2,
+    "normal-sessions": 0,
+    "null": 0,
+    "repeated-horizontal-bursts": 10,
+    "repeated-vertical-bursts": 10,
+    "service-discovery": 10,
+    "slow-syn": 0,
+    "threshold-edge-syn": 0,
+    "udp": 0,
+    "xmas": 0
+   },
+   "recall": 0.4125,
+   "total_alerts": 55,
+   "zero_tolerance_violations": []
+  }
+ },
+ "purpose": "Amendment A3 S1 sensitivity diagnostic; separately labeled; never merged into default-configuration headline numbers; not held-out or deployment performance",
+ "seeds": "0..9",
+ "split": "development"
+}
