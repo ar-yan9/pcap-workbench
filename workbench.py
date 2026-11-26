@@ -393,6 +393,37 @@ def investigate(path, window=60, ports=10, max_packets=100000, max_bytes=64*1024
                                'source':pseudonym('ip',pair[0]), 'target':pseudonym('ip',pair[1]),
                                'distinct_destination_ports':len(unique), 'detected_at':iso(event['time_ns']),
                                'evidence_packets':[e['number'] for e in queue]})
+    convs = {}
+    for (a, b, sp, dp, protocol), f in flows.items():
+        lo, hi = sorted([(a, sp), (b, dp)])
+        conv_key = (protocol, lo, hi)
+        conv = convs.setdefault(conv_key, {'forward': None, 'reverse': None})
+        direction = 'forward' if (a, sp) == lo else 'reverse'
+        conv[direction] = f
+    conv_rows = []
+    one_way = 0
+    for (protocol, lo, hi), conv in convs.items():
+        fwd, rev = conv['forward'], conv['reverse']
+        answered = fwd is not None and rev is not None
+        if not answered:
+            one_way += 1
+        if fwd and (not rev or fwd['first'] <= rev['first']):
+            initiator = 'a'
+        else:
+            initiator = 'b'
+        firsts = [s['first'] for s in (fwd, rev) if s]
+        lasts = [s['last'] for s in (fwd, rev) if s]
+        conv_rows.append({'peer_a': pseudonym('ip', lo[0]), 'port_a': lo[1],
+                          'peer_b': pseudonym('ip', hi[0]), 'port_b': hi[1],
+                          'protocol': protocol,
+                          'packets_a_to_b': fwd['packets'] if fwd else 0,
+                          'packets_b_to_a': rev['packets'] if rev else 0,
+                          'bytes_a_to_b': fwd['ip_bytes'] if fwd else 0,
+                          'bytes_b_to_a': rev['ip_bytes'] if rev else 0,
+                          'first': iso(min(firsts)), 'last': iso(max(lasts)),
+                          'initiator': initiator, 'answered': answered})
+    conv_rows.sort(key=lambda r: (-(r['bytes_a_to_b'] + r['bytes_b_to_a']),
+                                  r['peer_a'], r['port_a'], r['peer_b'], r['port_b']))
     ranked = sorted(flows.items(),key=lambda item:(-item[1]['ip_bytes'],item[0]))[:20]
     flow_rows=[{'source':pseudonym('ip',a),'target':pseudonym('ip',b), 'source_port':sp,'target_port':dp,
                 'protocol':protocol,'packets':f['packets'],'ip_bytes':f['ip_bytes'],
@@ -401,11 +432,13 @@ def investigate(path, window=60, ports=10, max_packets=100000, max_bytes=64*1024
               for (name,qt),count in queries.most_common(20)]
     return {'stats':{'capture_records':len(packets),'capture_format':capture_format,'decoded_packets':len(events),
                      'protocol_packets':dict(protocols), 'skipped_by_reason':dict(skipped),
-                     'total_directional_flows':len(flows),'dns_questions':sum(queries.values()),
+                     'total_directional_flows':len(flows),'conversations':len(convs),
+                     'one_way_conversations':one_way,'dns_questions':sum(queries.values()),
                      'snaplen_truncated_records':sum(p['captured']<p['original'] for p in packets)},
-            'top_flows':flow_rows, 'dns_queries':dns_rows, 'alerts':alerts,'notices':notices,
+            'top_flows':flow_rows, 'conversations':conv_rows[:20], 'dns_queries':dns_rows,
+            'alerts':alerts,'notices':notices,
             'settings':{'window_seconds':window,'port_threshold':ports},
-            'scope':'Classic PCAP and PCAPNG Ethernet IPv4/IPv6 TCP/UDP only. Per-report pseudonyms; no payload export. Heuristics, not confirmed attacks.'}
+            'scope':'Classic PCAP and PCAPNG Ethernet IPv4/IPv6 TCP/UDP only. Conversations pair reversed five-tuples only; no stream reassembly or payload export. Per-report pseudonyms. Heuristics, not confirmed attacks.'}
 
 
 def main(argv=None):
@@ -426,6 +459,7 @@ def main(argv=None):
         print(json.dumps(report,indent=2))
     else:
         print('PCAP Workbench: %d decoded packet(s), %d review alert(s)' % (report['stats']['decoded_packets'],len(report['alerts'])))
+        print('Conversations: %d (%d one-way)' % (report['stats']['conversations'],report['stats']['one_way_conversations']))
         print('Stats:',report['stats'])
         for alert in report['alerts']:
             print('{rule} [{severity}] {source} -> {target}; ports={distinct_destination_ports}; packets={evidence_packets}'.format(**alert))
