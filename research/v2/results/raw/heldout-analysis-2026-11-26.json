@@ -1,0 +1,413 @@
+{
+ "ambiguous_excluded": {
+  "mixed-families": "excluded from primary recall/precision per contract s6"
+ },
+ "analysis": "A4 section 4 predeclared analysis",
+ "benign_alert_rates": {
+  "snort": {
+   "approved-admin-scan": {
+    "alerts": 20,
+    "alerts_per_trace_hour": 1.0,
+    "alerts_per_unit": 1.0,
+    "trace_hours": 20.0,
+    "units": 20
+   },
+   "few-port-retries": {
+    "alerts": 0,
+    "alerts_per_trace_hour": 0.0,
+    "alerts_per_unit": 0.0,
+    "trace_hours": 20.0,
+    "units": 20
+   },
+   "fin-ack-teardown": {
+    "alerts": 0,
+    "alerts_per_trace_hour": 0.0,
+    "alerts_per_unit": 0.0,
+    "trace_hours": 20.0,
+    "units": 20
+   },
+   "nat-shared-source": {
+    "alerts": 0,
+    "alerts_per_trace_hour": 0.0,
+    "alerts_per_unit": 0.0,
+    "trace_hours": 20.0,
+    "units": 20
+   },
+   "normal-sessions": {
+    "alerts": 0,
+    "alerts_per_trace_hour": 0.0,
+    "alerts_per_unit": 0.0,
+    "trace_hours": 20.0,
+    "units": 20
+   },
+   "service-discovery": {
+    "alerts": 0,
+    "alerts_per_trace_hour": 0.0,
+    "alerts_per_unit": 0.0,
+    "trace_hours": 20.0,
+    "units": 20
+   }
+  },
+  "v2": {
+   "approved-admin-scan": {
+    "alerts": 20,
+    "alerts_per_trace_hour": 1.0,
+    "alerts_per_unit": 1.0,
+    "trace_hours": 20.0,
+    "units": 20
+   },
+   "few-port-retries": {
+    "alerts": 0,
+    "alerts_per_trace_hour": 0.0,
+    "alerts_per_unit": 0.0,
+    "trace_hours": 20.0,
+    "units": 20
+   },
+   "fin-ack-teardown": {
+    "alerts": 0,
+    "alerts_per_trace_hour": 0.0,
+    "alerts_per_unit": 0.0,
+    "trace_hours": 20.0,
+    "units": 20
+   },
+   "nat-shared-source": {
+    "alerts": 18,
+    "alerts_per_trace_hour": 0.9,
+    "alerts_per_unit": 0.9,
+    "trace_hours": 20.0,
+    "units": 20
+   },
+   "normal-sessions": {
+    "alerts": 0,
+    "alerts_per_trace_hour": 0.0,
+    "alerts_per_unit": 0.0,
+    "trace_hours": 20.0,
+    "units": 20
+   },
+   "service-discovery": {
+    "alerts": 5,
+    "alerts_per_trace_hour": 0.25,
+    "alerts_per_unit": 0.25,
+    "trace_hours": 20.0,
+    "units": 20
+   }
+  },
+  "zeek": {
+   "approved-admin-scan": {
+    "alerts": 0,
+    "alerts_per_trace_hour": 0.0,
+    "alerts_per_unit": 0.0,
+    "trace_hours": 20.0,
+    "units": 20
+   },
+   "few-port-retries": {
+    "alerts": 0,
+    "alerts_per_trace_hour": 0.0,
+    "alerts_per_unit": 0.0,
+    "trace_hours": 20.0,
+    "units": 20
+   },
+   "fin-ack-teardown": {
+    "alerts": 0,
+    "alerts_per_trace_hour": 0.0,
+    "alerts_per_unit": 0.0,
+    "trace_hours": 20.0,
+    "units": 20
+   },
+   "nat-shared-source": {
+    "alerts": 0,
+    "alerts_per_trace_hour": 0.0,
+    "alerts_per_unit": 0.0,
+    "trace_hours": 20.0,
+    "units": 20
+   },
+   "normal-sessions": {
+    "alerts": 0,
+    "alerts_per_trace_hour": 0.0,
+    "alerts_per_unit": 0.0,
+    "trace_hours": 20.0,
+    "units": 20
+   },
+   "service-discovery": {
+    "alerts": 0,
+    "alerts_per_trace_hour": 0.0,
+    "alerts_per_unit": 0.0,
+    "trace_hours": 20.0,
+    "units": 20
+   }
+  }
+ },
+ "bootstrap": {
+  "analysis_seed": 20261113,
+  "intervals": {
+   "snort": {
+    "n_resamples": 10000,
+    "p2.5": 0.0,
+    "p50": 0.0,
+    "p97.5": 0.0
+   },
+   "v2": {
+    "n_resamples": 10000,
+    "p2.5": 0.94375,
+    "p50": 0.96875,
+    "p97.5": 0.9875
+   },
+   "v2_minus_snort": {
+    "n_resamples": 10000,
+    "p2.5": 0.94375,
+    "p50": 0.96875,
+    "p97.5": 0.9875
+   },
+   "v2_minus_zeek": {
+    "n_resamples": 10000,
+    "p2.5": 0.94375,
+    "p50": 0.96875,
+    "p97.5": 0.9875
+   },
+   "zeek": {
+    "n_resamples": 10000,
+    "p2.5": 0.0,
+    "p50": 0.0,
+    "p97.5": 0.0
+   }
+  },
+  "resamples": 10000,
+  "selection_scope_families": [
+   "fast-vertical-syn",
+   "fin",
+   "horizontal-syn",
+   "null",
+   "repeated-horizontal-bursts",
+   "repeated-vertical-bursts",
+   "threshold-edge-syn",
+   "xmas"
+  ],
+  "unit": "trace (cluster), stratified by family, engines paired on trace"
+ },
+ "duplicate_burden": {
+  "snort-3.13.2.0 port_scan inspector defaults": 0,
+  "v2 detector (W=300, T=5) frozen": 0,
+  "zeek-8.0.11+bro-simple-scan(35cf19cf)+bro-is-darknet(7564a8f2) defaults": 0
+ },
+ "latency": {
+  "v2_matched_pair_distance_ns": {
+   "max_s": 0.0,
+   "median_s": 0.0,
+   "n": 293,
+   "note": "baseline decision timestamps unavailable per contract; EOF/start timestamps are not decision times"
+  }
+ },
+ "overall": {
+  "snort": {
+   "matched": 0,
+   "recall": 0.0,
+   "total": 160
+  },
+  "v2": {
+   "matched": 155,
+   "recall": 0.96875,
+   "total": 160
+  },
+  "zeek": {
+   "matched": 0,
+   "recall": 0.0,
+   "total": 160
+  }
+ },
+ "per_family": {
+  "snort": {
+   "fast-vertical-syn": {
+    "campaigns_matched": 0,
+    "campaigns_total": 20,
+    "recall": 0.0
+   },
+   "fin": {
+    "campaigns_matched": 0,
+    "campaigns_total": 20,
+    "recall": 0.0
+   },
+   "horizontal-syn": {
+    "campaigns_matched": 0,
+    "campaigns_total": 20,
+    "recall": 0.0
+   },
+   "null": {
+    "campaigns_matched": 0,
+    "campaigns_total": 20,
+    "recall": 0.0
+   },
+   "repeated-horizontal-bursts": {
+    "campaigns_matched": 0,
+    "campaigns_total": 20,
+    "recall": 0.0
+   },
+   "repeated-vertical-bursts": {
+    "campaigns_matched": 0,
+    "campaigns_total": 20,
+    "recall": 0.0
+   },
+   "threshold-edge-syn": {
+    "campaigns_matched": 0,
+    "campaigns_total": 20,
+    "recall": 0.0
+   },
+   "xmas": {
+    "campaigns_matched": 0,
+    "campaigns_total": 20,
+    "recall": 0.0
+   }
+  },
+  "v2": {
+   "fast-vertical-syn": {
+    "campaigns_matched": 20,
+    "campaigns_total": 20,
+    "recall": 1.0
+   },
+   "fin": {
+    "campaigns_matched": 20,
+    "campaigns_total": 20,
+    "recall": 1.0
+   },
+   "horizontal-syn": {
+    "campaigns_matched": 20,
+    "campaigns_total": 20,
+    "recall": 1.0
+   },
+   "null": {
+    "campaigns_matched": 20,
+    "campaigns_total": 20,
+    "recall": 1.0
+   },
+   "repeated-horizontal-bursts": {
+    "campaigns_matched": 20,
+    "campaigns_total": 20,
+    "recall": 1.0
+   },
+   "repeated-vertical-bursts": {
+    "campaigns_matched": 20,
+    "campaigns_total": 20,
+    "recall": 1.0
+   },
+   "threshold-edge-syn": {
+    "campaigns_matched": 15,
+    "campaigns_total": 20,
+    "recall": 0.75
+   },
+   "xmas": {
+    "campaigns_matched": 20,
+    "campaigns_total": 20,
+    "recall": 1.0
+   }
+  },
+  "zeek": {
+   "fast-vertical-syn": {
+    "campaigns_matched": 0,
+    "campaigns_total": 20,
+    "recall": 0.0
+   },
+   "fin": {
+    "campaigns_matched": 0,
+    "campaigns_total": 20,
+    "recall": 0.0
+   },
+   "horizontal-syn": {
+    "campaigns_matched": 0,
+    "campaigns_total": 20,
+    "recall": 0.0
+   },
+   "null": {
+    "campaigns_matched": 0,
+    "campaigns_total": 20,
+    "recall": 0.0
+   },
+   "repeated-horizontal-bursts": {
+    "campaigns_matched": 0,
+    "campaigns_total": 20,
+    "recall": 0.0
+   },
+   "repeated-vertical-bursts": {
+    "campaigns_matched": 0,
+    "campaigns_total": 20,
+    "recall": 0.0
+   },
+   "threshold-edge-syn": {
+    "campaigns_matched": 0,
+    "campaigns_total": 20,
+    "recall": 0.0
+   },
+   "xmas": {
+    "campaigns_matched": 0,
+    "campaigns_total": 20,
+    "recall": 0.0
+   }
+  }
+ },
+ "source_scoring_sha256": "ff4a0061a1a52b6acd364f131f6fdf160a19314e0e4aa7fe0d0ccdcc8b0d555d",
+ "stress_family_alert_counts_v2": {
+  "distributed-syn-s10": 0,
+  "distributed-syn-s11": 0,
+  "distributed-syn-s12": 0,
+  "distributed-syn-s13": 0,
+  "distributed-syn-s14": 0,
+  "distributed-syn-s15": 0,
+  "distributed-syn-s16": 0,
+  "distributed-syn-s17": 0,
+  "distributed-syn-s18": 0,
+  "distributed-syn-s19": 0,
+  "distributed-syn-s20": 0,
+  "distributed-syn-s21": 0,
+  "distributed-syn-s22": 0,
+  "distributed-syn-s23": 0,
+  "distributed-syn-s24": 0,
+  "distributed-syn-s25": 0,
+  "distributed-syn-s26": 0,
+  "distributed-syn-s27": 0,
+  "distributed-syn-s28": 0,
+  "distributed-syn-s29": 0,
+  "slow-syn-s10": 0,
+  "slow-syn-s11": 0,
+  "slow-syn-s12": 0,
+  "slow-syn-s13": 0,
+  "slow-syn-s14": 0,
+  "slow-syn-s15": 0,
+  "slow-syn-s16": 0,
+  "slow-syn-s17": 0,
+  "slow-syn-s18": 0,
+  "slow-syn-s19": 0,
+  "slow-syn-s20": 0,
+  "slow-syn-s21": 0,
+  "slow-syn-s22": 0,
+  "slow-syn-s23": 0,
+  "slow-syn-s24": 0,
+  "slow-syn-s25": 0,
+  "slow-syn-s26": 0,
+  "slow-syn-s27": 0,
+  "slow-syn-s28": 0,
+  "slow-syn-s29": 0,
+  "udp-s10": 0,
+  "udp-s11": 0,
+  "udp-s12": 0,
+  "udp-s13": 0,
+  "udp-s14": 0,
+  "udp-s15": 0,
+  "udp-s16": 0,
+  "udp-s17": 0,
+  "udp-s18": 0,
+  "udp-s19": 0,
+  "udp-s20": 0,
+  "udp-s21": 0,
+  "udp-s22": 0,
+  "udp-s23": 0,
+  "udp-s24": 0,
+  "udp-s25": 0,
+  "udp-s26": 0,
+  "udp-s27": 0,
+  "udp-s28": 0,
+  "udp-s29": 0
+ },
+ "zero_tolerance_violations": {
+  "snort-3.13.2.0 port_scan inspector defaults": 0,
+  "v2 detector (W=300, T=5) frozen": 0,
+  "zeek-8.0.11+bro-simple-scan(35cf19cf)+bro-is-darknet(7564a8f2) defaults": 0
+ }
+}
