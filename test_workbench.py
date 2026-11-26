@@ -49,6 +49,16 @@ def compressed_dns_frame():
     udp = struct.pack('!4H', 53000, 53, 8 + len(dns), 0) + dns
     return demo.frame(17, udp, dst='203.0.113.53')
 
+
+
+def tcp6_reverse_frame(sport, flags=0x12):
+    segment = struct.pack('!HHIIBBHHH', sport, 45000, 1, 0, 0x50, flags, 4096, 0, 0)
+    source = ipaddress.ip_address('2001:db8::20').packed
+    target = ipaddress.ip_address('2001:db8::10').packed
+    pseudo = source + target + struct.pack('!I3xB', len(segment), 6)
+    segment = segment[:16] + struct.pack('!H', demo.checksum(pseudo + segment)) + segment[18:]
+    return ipv6_frame(6, segment, src='2001:db8::20', dst='2001:db8::10')
+
 class CaptureTests(unittest.TestCase):
     def setUp(self):
         self.temp=tempfile.TemporaryDirectory()
@@ -96,6 +106,42 @@ class CaptureTests(unittest.TestCase):
     def test_flow_sort(self):
         self.write([demo.tcp_frame(443)]*3+[demo.tcp_frame(80)])
         self.assertEqual(self.run_report()['top_flows'][0]['target_port'],443)
+    def test_conversation_pairs_reversed_flows(self):
+        self.write([tcp6_frame(80, flags=2), tcp6_reverse_frame(80, flags=0x12)])
+        report = self.run_report()
+        self.assertEqual(report['stats']['conversations'], 1)
+        self.assertEqual(report['stats']['one_way_conversations'], 0)
+        conv = report['conversations'][0]
+        self.assertTrue(conv['answered'])
+        self.assertEqual(conv['initiator'], 'a')
+        self.assertEqual(conv['packets_a_to_b'], 1)
+        self.assertEqual(conv['packets_b_to_a'], 1)
+        self.assertEqual(conv['port_a'], 45000)
+        self.assertEqual(conv['port_b'], 80)
+
+    def test_conversation_one_way_udp(self):
+        self.write([dns6_frame()])
+        report = self.run_report()
+        self.assertEqual(report['stats']['conversations'], 1)
+        self.assertEqual(report['stats']['one_way_conversations'], 1)
+        conv = report['conversations'][0]
+        self.assertFalse(conv['answered'])
+        self.assertEqual(conv['packets_b_to_a'], 0)
+
+    def test_conversation_distinct_ports_stay_separate(self):
+        self.write([tcp6_frame(80, flags=2), tcp6_frame(443, flags=2)])
+        report = self.run_report()
+        self.assertEqual(report['stats']['conversations'], 2)
+        self.assertEqual(report['stats']['one_way_conversations'], 2)
+
+    def test_conversation_initiator_is_earlier_side(self):
+        # Server side speaks first: initiator is the lexically higher endpoint (b).
+        self.write([tcp6_reverse_frame(80, flags=2), tcp6_frame(80, flags=0x10)])
+        report = self.run_report()
+        conv = report['conversations'][0]
+        self.assertEqual(conv['initiator'], 'b')
+        self.assertTrue(conv['answered'])
+
     def test_packet_limit(self):
         self.write([demo.tcp_frame(443)]*2)
         self.assertTrue(self.run_report(max_packets=1)['notices'])
