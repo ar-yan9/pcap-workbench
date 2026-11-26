@@ -205,3 +205,106 @@ loaded policy.
    shipped default: the minimal change that makes the baseline comparison
    interpretable. Any further variation (thresholds, suppression,
    sensitivity levels) would constitute tuning and remains out of scope.
+
+## Amendment A4: held-out synthetic evaluation freeze, 26 November 2026
+
+Accepted 26 November 2026 and frozen in local version control before any
+held-out generation; remote publication follows separately. Throughout,
+"the Zeek baseline" means Zeek 8.0.11 plus the pinned third-party scanner
+packages (ncsa/bro-simple-scan 35cf19cf, ncsa/bro-is-darknet 7564a8f2) per
+Amendment A1, not generic Zeek capability.
+
+1. **Pre-conditions, all met.** The "Corpus and separation" section
+   requires parameter ranges and exact background/jitter/port/gap
+   distributions frozen in a checked-in generator specification before
+   held-out generation. This pre-condition is already satisfied and is
+   recorded explicitly here: synthetic corpus specification v0.1
+   (generators/synthetic-corpus-spec-v0.1.md, remote blob 1063f916,
+   including Errata E1/E2/E3) and the generator
+   (generators/synthetic_corpus.py, remote blob f8f01816) are checked in
+   on research/v2 and fully determine all 540 traces: sub-seed derivation
+   per (family, seed), per-family parameters, background, benign control
+   units and the label sidecar schema. No new design choice is needed to
+   generate seeds 10..29. The operating point (W=300, T=5), H = T, was
+   selected 18 November 2026 on development seeds 0..9 only, per the
+   frozen selection rule (operating-point-selection.md, remote blob
+   36bd6370) under the Amendment A2 budget as scoped by Amendment A2.1.
+   The v2 selection detector, matcher and evaluator contract v0.1
+   (evaluator-contract.md, remote blob 11ffdce9) are at the recorded
+   commits with CI green on the Gate A head. Baselines are pinned at
+   recorded default configurations and verified binary digests; activation
+   controls passed (600-packet positive, 64-packet negative, checksums
+   verified). Gate A closed 26 November 2026 after remote publication of
+   the v2 artifact set and green CI on the published head.
+2. **Held-out generation.** Generate exactly seeds 10..29 for all 18
+   families/units: 240 attack traces plus one benign control trace per
+   (benign unit, seed), 120 benign controls, 360 traces total, per spec
+   v0.1 section 1. No other seeds are generated in this step. Record a
+   generation manifest per "Repository layout and provenance": generator
+   commit, spec blob SHA-256, host/environment, UTC start/end, and
+   per-trace SHA-256 of every .pcap and label sidecar. Determinism
+   spot-check: before any scoring, independently regenerate a predeclared
+   sample (one trace per family, held-out seed = 10 + (family_index mod
+   20), fixed here before generation) in a clean directory and require
+   identical per-trace SHA-256. A mismatch halts the evaluation and is
+   reported as an erratum; it is never repaired by editing traces.
+   Generated pcaps stay local; the repository receives manifests, hashes
+   and counts only (spec v0.1 section 7: no capture publication).
+3. **Frozen scoring configuration.** v2 detector at (W=300, T=5) exactly
+   as selected; no grid, no re-tuning, no per-family adjustment. Zeek
+   baseline and Snort baseline at their recorded default configurations,
+   separately labeled per Amendment A1 and the claim discipline of
+   Amendment A3 section 4. No S1 sensitivity variant on held-out data
+   (decision recorded 26 November 2026): S1 remains a development-corpus
+   mechanism diagnostic only. The run manifest, exit-code contract and
+   failure accounting of this protocol apply unchanged: a failed exit
+   (interpreted per the engine's documented contract), missing output,
+   unread packets or a limit hit is a failed/incomplete run, never a
+   zero-alert success; the workbench's exit 1 with alerts is a completed
+   run.
+4. **Predeclared analysis.** Primary metrics per "Metrics, uncertainty
+   and failure accounting" and contract section 6: episode recall by
+   family (all-scenario and supported-scope denominators),
+   unique-matched-episode precision (undefined stays undefined), benign
+   alert episodes per unit per trace-hour using the spec-declared
+   durations, duplicate burden, and latency where genuinely observable.
+   Attack episodes drive recall; approved-benign-scan matches are expected
+   alerts in their own column; ambiguous episodes are excluded from
+   primary recall/precision and reported as a separate count with reject
+   reasons. Campaign-level results are reported separately from per-W
+   segmented units. Uncertainty: cluster bootstrap 10,000 resamples, fixed
+   analysis seed 20261113, stratified by family over independently
+   generated traces; engines paired on the same trace. Wide intervals are
+   published. Packets, flows and label rows are not independent
+   replicates. Baseline decision time stays unavailable where the baseline
+   provides no genuine decision timestamp; EOF/start timestamps are never
+   reported as decision times.
+5. **Decision rules.** Results are reported as measured, in whichever
+   direction they land. A disappointing recall, an unexpected
+   benign-alert burden, or a failed determinism check is a result, not a
+   trigger for iteration. No scoring output is used to change W, T, the
+   detector, the baselines, the matcher, the corpus or this amendment's
+   analysis plan. Any deviation discovered during execution is logged as a
+   dated erratum before any further run and preserved. Comparative
+   statements name the exact engine configurations and carry the
+   TEST-NET/local-classification interaction recorded in Amendment A3; no
+   unqualified superiority claim is made from these runs.
+6. **Leakage controls.** Held-out labels and trace content are not
+   inspected before the frozen scoring runs are complete. Generation
+   emits hashes and counts; the matcher reads labels only at scoring
+   time. No held-out number of any kind (recall, alert counts, timing,
+   resource use) feeds back into any selection decision. Development
+   artifacts (dev corpus, dev results, S1) remain labeled development and
+   are never pooled with held-out results.
+7. **Gate C evidence (synthetic portion).** This amendment supplies the
+   synthetic-corpus portion of Gate C: corpus provenance (generator
+   commit, spec blob, manifests), per-trace hashes, label sidecars under
+   schema v0.1, and the frozen 0..9 / 10..29 split. The public-label
+   audit for the CIC-IDS2017 slices is a separate later milestone
+   (decision recorded 26 November 2026) and is out of scope here.
+8. **Execution order after acceptance.** Freeze this amendment in version
+   control; publish to research/v2. Generate per section 2; spot-check
+   determinism; record manifests. Score per section 3 in one frozen
+   batch; record run manifests. Analyze per section 4; write results with
+   raw JSON records preserved. Report, then reproduce independently
+   before any paper text is written from these numbers.
