@@ -33,6 +33,7 @@ Exit codes: **0** = no heuristic alerts in the decoded scope; **1** = review ale
 - All questions in each DNS query message to UDP destination port 53, including compression-pointer names decoded with loop and hop caps; top 20 query-name/type counts. Names are pseudonymized, not printed.
 - Inclusive sliding-window TCP SYN-without-ACK rule: at least 10 distinct destination ports from one source to one target within 60 seconds, by default. Retransmissions to the same port do not increase the distinct-port count.
 - JSON/text reports, parser bounds, packet-number evidence and generic error messages.
+- Bidirectional conversation summaries that pair reversed five-tuples: per-conversation packet/byte counts per direction, initiator side and one-way (unanswered) flags.
 
 ```bat
 py -3.11 workbench.py demo.pcap --ports 15
@@ -54,9 +55,9 @@ Only analyze captures you own, are authorized to inspect, or that were intention
 
 ## Tests and next milestones
 
-54 synthetic tests cover all four classic file magic variants, PCAPNG endian/timestamp variants, multi-section captures (byte-order changes, per-section interface tables, malformed or unsupported later sections) and block handling, VLANs, IPv4/IPv6, IPv6 extension/fragment skips, malformed framing/transport headers, DNS bounds, compression pointers/loops/hop caps, multi-question messages, resource limits, redaction, port thresholds, inclusive windows, repeated ports, SYN/ACK exclusion, exit states and overwrite protection. CI runs on Windows 2022 and Ubuntu 24.04 with Python 3.10-3.13.
+58 synthetic tests cover all four classic file magic variants, PCAPNG endian/timestamp variants, multi-section captures (byte-order changes, per-section interface tables, malformed or unsupported later sections) and block handling, VLANs, IPv4/IPv6, IPv6 extension/fragment skips, malformed framing/transport headers, DNS bounds, compression pointers/loops/hop caps, multi-question messages, resource limits, redaction, port thresholds, inclusive windows, repeated ports, SYN/ACK exclusion, conversation pairing, one-way detection, initiator sides, exit states and overwrite protection. CI runs on Windows 2022 and Ubuntu 24.04 with Python 3.10-3.13.
 
-Next real work: bidirectional sessions and Zeek-log import; a local investigation UI and timeline; benchmarks against known safe capture fixtures. These are roadmap items, not delivered features. Learn the binary parser, five-tuple grouping and window rule before claiming interview ownership or production deployment.
+Next real work: Zeek-log import; a local investigation UI and timeline; benchmarks against known safe capture fixtures. These are roadmap items, not delivered features. Learn the binary parser, five-tuple grouping and window rule before claiming interview ownership or production deployment.
 
 ## Reproducible port-scan study artifacts (revision 3)
 
